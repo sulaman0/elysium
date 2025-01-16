@@ -3,7 +3,7 @@
 # Information
 **An Ethereum compatible Chain built with the [Polkadot-SDK](https://github.com/paritytech/polkadot-sdk).**
 
-👉 _Discover the Elysium project at [elysium.network](https://docs.elysiumchain.tech/docs/network-endpoints)._<br>
+👉 _Discover the Elysium project at [elysium](https://docs.elysiumchain.tech/docs/network-endpoints)._<br>
 👉 _Learn to [use the Elysium network](https://docs.elysiumchain.tech/docs/intro) with our technical docs._<br>
 
 ## Run Elysium Local Development Node with Docker
