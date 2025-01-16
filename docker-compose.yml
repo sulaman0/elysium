@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  elysium-node:
+    container_name: elysium-node
+    image: intellicoworks/elysium:latest
+    ports:
+      - 30333:30333 # p2p port
+      - 9933:9933 # rpc port
+      - 9944:9944 # ws port
+    volumes:
+      - ~/chain-data:/data
+    command: [
+      "--name","elysium-node",
+      "--rpc-cors", "all",
+      "--unsafe-rpc-external",
+      "--rpc-methods=Safe",
+      "--unsafe-ws-external",
+      "--prometheus-external",
+      "--node-key", "ed12f00f049d73e8573c5567317fdb5d5d93b2a06e4f9e3d1da4fd914ca9566f",
+      "--chain", "/usr/local/bin/elysiumSpecRaw.json",
+      "--bootnodes", "/ip4/149.56.24.141/tcp/30333/p2p/12D3KooWGRwF66g11uFWzRHHcfj5gehnFj1oXRHdwnJ1dGa2Nai3",
+      "--offchain-worker","always",
+      "--validator"
+    ]

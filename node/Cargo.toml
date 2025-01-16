@@ -1,0 +1,279 @@
+[package]
+authors = ['Bloxbytes']
+build = 'build.rs'
+description = 'Elysium provides the lightning-fast transaction speeds and unprecedented scalability. Elysium is optimized for your Game, NFT, AI, or metaverse project.'
+edition = '2021'
+homepage = 'https://elysiumchain.tech/'
+license = 'GPL-3.0-only'
+name = 'elysium'
+publish = false
+repository = 'https://github.com/VForged/elysium'
+version = '7.0.0'
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[features]
+aura = [
+    'sc-consensus-aura',
+    'elysium-runtime/aura',
+]
+default = [
+    'aura',
+    'with-rocksdb-weights',
+]
+manual-seal = [
+    'sc-consensus-manual-seal',
+    'elysium-runtime/manual-seal',
+]
+rpc_binary_search_estimate = ['fc-rpc/rpc_binary_search_estimate']
+runtime-benchmarks = ['elysium-runtime/runtime-benchmarks']
+with-paritydb-weights = ['elysium-runtime/with-paritydb-weights']
+with-rocksdb-weights = ['elysium-runtime/with-rocksdb-weights']
+
+[dependencies]
+async-trait = '0.1'
+futures = '0.3.30'
+log = '0.4.20'
+bs58 = "0.5.0"
+hex-literal = { version = '0.4.1' }
+jsonrpc-core = '18.0.0'
+jsonrpc-pubsub = '18.0.0'
+
+[dependencies.clap]
+features = ['derive']
+version = '3.2'
+
+[dependencies.codec]
+features = ['derive']
+package = 'parity-scale-codec'
+version = '3.1'
+
+[dependencies.fc-cli]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fc-consensus]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fc-db]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fc-mapping-sync]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fc-rpc]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fc-rpc-core]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fp-consensus]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fp-dynamic-fee]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fp-evm]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fp-rpc]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.fp-storage]
+git = 'https://github.com/paritytech/frontier.git'
+rev = '32f9c7eaf5aa550191c90e14476b145e5d7833d7'
+
+[dependencies.frame-benchmarking]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.frame-benchmarking-cli]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.elysium-runtime]
+default-features = false
+features = ['std']
+path = '../runtime'
+
+[dependencies.jsonrpsee]
+features = [
+    'server',
+    'macros',
+]
+version = '0.14.0'
+
+[dependencies.pallet-transaction-payment]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.pallet-transaction-payment-rpc]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-basic-authorship]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-cli]
+branch = 'polkadot-v0.9.27'
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-client-api]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-consensus]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-consensus-aura]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+optional = true
+version = '0.10.0-dev'
+
+[dependencies.sc-consensus-manual-seal]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+optional = true
+version = '0.10.0-dev'
+
+[dependencies.sc-executor]
+branch = 'polkadot-v0.9.27'
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-finality-grandpa]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-keystore]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-network]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-rpc]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-rpc-api]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-service]
+branch = 'polkadot-v0.9.27'
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sc-telemetry]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-transaction-pool]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sc-transaction-pool-api]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-api]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-block-builder]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-blockchain]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-consensus]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sp-consensus-aura]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '0.10.0-dev'
+
+[dependencies.sp-core]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '6.0.0'
+
+[dependencies.sp-finality-grandpa]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-inherents]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.sp-keyring]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '6.0.0'
+
+[dependencies.sp-runtime]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '6.0.0'
+
+[dependencies.sp-timestamp]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+
+[dependencies.substrate-frame-rpc-system]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '4.0.0-dev'
+[build-dependencies.substrate-build-script-utils]
+branch = 'polkadot-v0.9.27'
+git = 'https://github.com/paritytech/substrate'
+version = '3.0.0'
