@@ -111,35 +111,6 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-        pub fn generate_users_coins(origin: OriginFor<T>, who: T::AccountId, coins: BalanceOf<T>) -> DispatchResult {
-            log::info!("generating coins...");
-            let mut full_issuance: BalanceOf<T> = Zero::zero();
-            let signer = ensure_signed(origin)?;
-            log::info!("Signer Details with ID: {:?}.", signer);
-            ensure!(Signers::<T>::contains_key(&signer), Error::<T>::NotSigner);
-            log::info!("signer key verified.");
-            let current_supply = T::Currency::total_issuance();
-            full_issuance = full_issuance
-                .checked_add(&coins)
-                .ok_or(Error::<T>::LowBalanceToBurn)?;
-                log::info!("current_supply. {:?}",current_supply);
-                log::info!("new coins to generate {:?}",coins);
-            ensure!(
-				current_supply.saturating_add(full_issuance) <= T::MaximumSupply::get(),
-				Error::<T>::TooManyCoinsToAllocate
-			);
-            match T::Currency::deposit_into_existing(&who, coins) {
-                Ok(_) => {
-                    Self::deposit_event(Event::UserCoinsIssued(who, coins));
-                }
-                Err(_) => {
-                    log::error!("Wallet doesn't match to deposit coins");
-                }
-            };
-            Ok(())
-        }
-        //
-        #[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
         pub fn add_signer(origin: OriginFor<T>, signer: T::AccountId) -> DispatchResult {
             ensure_root(origin)?;
             ensure!(!Signers::<T>::contains_key(&signer),Error::<T>::AlreadySigner);

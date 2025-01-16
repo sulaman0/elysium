@@ -1,5 +1,5 @@
 # This is the build stage for elysium. Here we create the binary in a temporary image.
-FROM docker.io/paritytech/ci-linux:production as builder
+FROM docker.io/paritytech/ci-linux:production AS builder
 WORKDIR /elysium
 COPY . /elysium
 
@@ -25,6 +25,7 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /elysium elysium && \
 	mkdir -p /data /elysium/.local/share && \
 	chown -R elysium:elysium /data && \
 	ln -s /data /elysium/.local/share/elysium && \
+    # unclutter and minimize the attack surface
 	rm -rf /usr/bin /usr/sbin
 
 USER elysium

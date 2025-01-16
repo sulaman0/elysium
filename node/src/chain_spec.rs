@@ -2,20 +2,22 @@ use std::{collections::BTreeMap, str::FromStr};
 
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public, H160, U256,OpaquePeerId};
-use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_core::{sr25519, Pair, Public, H160, U256, OpaquePeerId};
+use sp_consensus_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 use jsonrpc_core::serde_json::json;
 
-use elysium_runtime::{AccountId, GenesisConfig, Signature, WASM_BINARY,Balance,
-	currency::LAVA, opaque::SessionKeys, ValidatorSetConfig, SessionConfig,NodeAuthorizationConfig,CHAIN_ID};
+use elysium_runtime::{
+	AccountId, GenesisConfig, Signature, WASM_BINARY, Balance,
+	currency::LAVA, opaque::SessionKeys, ValidatorSetConfig, SessionConfig,NodeAuthorizationConfig,CHAIN_ID
+};
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
-const INITIAL_BALANCE: Balance = 200000000000000000 * LAVA;
+const INITIAL_BALANCE: Balance = 2000 * LAVA;
 /// Generate a crypto pair from seed.
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
 	TPublic::Pair::from_string(&format!("//{}", seed), None)
@@ -28,13 +30,6 @@ fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
 	SessionKeys { aura, grandpa }
 }
 
-pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId) {
-	(
-		get_account_id_from_seed::<sr25519::Public>(s),
-		get_from_seed::<AuraId>(s),
-		get_from_seed::<GrandpaId>(s)
-	)
-}
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
 where
@@ -44,10 +39,13 @@ where
 }
 
 /// Generate an Aura authority key.
-// pub fn authority_keys_from_seed(s: &str) -> (AuraId, GrandpaId) {
-// 	(get_from_seed::<AuraId>(s), get_from_seed::<GrandpaId>(s))
-// }
-
+pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId) {
+	(
+		get_account_id_from_seed::<sr25519::Public>(s),
+		get_from_seed::<AuraId>(s),
+		get_from_seed::<GrandpaId>(s)
+	)
+}
 pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
@@ -157,7 +155,7 @@ fn testnet_genesis(
 ) -> GenesisConfig {
 	use elysium_runtime::{
 		AuraConfig, BalancesConfig, EVMChainIdConfig, EVMConfig, GrandpaConfig, SudoConfig,
-		SystemConfig,ElysiumConfig
+		SystemConfig, ElysiumConfig
 	};
 
 	GenesisConfig {
@@ -177,7 +175,7 @@ fn testnet_genesis(
 			balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k, INITIAL_BALANCE))
+				.map(|k| (k, 1 << 60))
 				.collect(),
 		},
 		validator_set: ValidatorSetConfig {
@@ -189,7 +187,6 @@ fn testnet_genesis(
 			}).collect::<Vec<_>>(),
 		},
 		transaction_payment: Default::default(),
-
 		// Consensus
 		aura: AuraConfig {
 			authorities: vec![],
@@ -197,7 +194,6 @@ fn testnet_genesis(
 		grandpa: GrandpaConfig {
 			authorities: vec![],
 		},
-
 		// EVM compatibility
 		evm_chain_id: EVMChainIdConfig { chain_id },
 		evm: EVMConfig {
@@ -247,33 +243,30 @@ fn testnet_genesis(
 		},
 		ethereum: Default::default(),
 		elysium: ElysiumConfig {
-            balance: INITIAL_BALANCE,
-            main_account: 
+			balance: INITIAL_BALANCE,
+			main_account:
 			endowed_accounts
 				.iter()
 				.cloned()
 				.map(|k| (k, INITIAL_BALANCE))
 				.collect()
-        },
+		},
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
 		node_authorization: NodeAuthorizationConfig {
-            nodes: vec![
-                (
-                    OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
-                    endowed_accounts[0].clone()
-                ),
-                (
-                    OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
-                    endowed_accounts[1].clone()
-                )
-            ],
-        },
-    
+			nodes: vec![
+				(
+					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
+					endowed_accounts[0].clone()
+				),
+				(
+					OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
+					endowed_accounts[1].clone()
+				)
+			],
+		},
 	}
 }
-
-// main net config
 
 pub fn prod_mainnet_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Live wasm not available".to_string())?;
@@ -319,8 +312,6 @@ pub fn prod_mainnet_config() -> Result<ChainSpec, String> {
 		None,
 	))
 }
-
-/// Configure initial storage state for FRAME modules.
 fn mainnet_genesis(
 	wasm_binary: &[u8],
 	sudo_key: AccountId,
@@ -375,31 +366,31 @@ fn mainnet_genesis(
 		evm_chain_id: EVMChainIdConfig { chain_id },
 		evm: EVMConfig {
 			accounts: BTreeMap::new(),
-			},
+		},
 		ethereum: Default::default(),
 		elysium: ElysiumConfig {
-            balance: INITIAL_BALANCE,
-            main_account:
+			balance: INITIAL_BALANCE,
+			main_account:
 			endowed_accounts
 				.iter()
 				.cloned()
 				.map(|k| (k, INITIAL_BALANCE))
 				.collect()
-        },
+		},
 		dynamic_fee: Default::default(),
 		base_fee: Default::default(),
 		node_authorization: NodeAuthorizationConfig {
-            nodes: vec![
-                (
-                    OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
-                    endowed_accounts[0].clone()
-                ),
-                (
-                    OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
-                    endowed_accounts[1].clone()
-                )
-            ],
-        },
+			nodes: vec![
+				(
+					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
+					endowed_accounts[0].clone()
+				),
+				(
+					OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
+					endowed_accounts[1].clone()
+				)
+			],
+		},
 
 	}
 }

@@ -149,3 +149,6 @@ From Frontier:
 The following pallets are stored in `pallets/`. They are designed for Elysium's specific requirements:
 When modifying the git repository for these dependencies, a tool called [diener](https://github.com/bkchr/diener) can be used to replace the git URL and branch for each reference in all `Cargo.toml` files with a single command. This alleviates a lot of the repetitive modifications necessary when changing dependency versions.
 
+## Changelog
+
+You can find the changelog [here](./CHANGELOG.md).
