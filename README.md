@@ -133,18 +133,18 @@ The Elysium Runtime, built using FRAME, comprises pallets from Polkadot-SDK, Fro
 
 From Polkadot-SDK:
 
-- _Utility_: Allows users to use derivative accounts, and batch calls
-- _Balances_: Tracks ELY token balances
-- _Sudo_: Allows a privileged account to make arbitrary runtime changes. This will be removed by Governance.
-- _Timestamp_: On-Chain notion of time
-- _Transaction Payment_: Transaction payment (fee) management
-- _Randomness Collective Flip_: A (mock) onchain randomness beacon, which will be replaced by parachain randomness by mainnet.
+- **Utility**: Allows users to use derivative accounts, and batch calls
+- **Balances**: Tracks ELY token balances
+- **Sudo**: Allows a privileged account to make arbitrary runtime changes. This will be removed by Governance.
+- **Timestamp**: On-Chain notion of time
+- **Transaction Payment**: Transaction payment (fee) management
+- **Randomness Collective Flip**: A (mock) onchain randomness beacon, which will be replaced by chain randomness by mainnet.
 
 From Frontier:
 
-- _EVM Chain Id_: A place to store the chain id
-- _EVM_: Encapsulates execution logic for an Ethereum Virtual Machine
-- _Ethereum_: Ethereum-style data encoding and access for the EVM.
+- **EVM Chain Id**: A place to store the chain id
+- **EVM**: Encapsulates execution logic for an Ethereum Virtual Machine
+- **Ethereum**: Ethereum-style data encoding and access for the EVM.
 
 The following pallets are stored in `pallets/`. They are designed for Elysium's specific requirements:
 When modifying the git repository for these dependencies, a tool called [diener](https://github.com/bkchr/diener) can be used to replace the git URL and branch for each reference in all `Cargo.toml` files with a single command. This alleviates a lot of the repetitive modifications necessary when changing dependency versions.
