@@ -1,0 +1,88 @@
+./target/release/elysium build-spec --disable-default-bootnode --chain local > customSpecS.json
+./target/release/elysium build-spec --chain=customSpecS.json --raw --disable-default-bootnode > customSpecSRaw.json
+
+======================================== Alice Account
+
+Secret phrase: bottom drive obey lake curtain smoke basket hold race lonely fit walk
+Network ID: substrate
+Secret seed: 0xe5be9a5092b81bcae88d5d0a7cf0d1c7af12ab5d12b200fd6fb9de14e8ffcf50
+Public key (hex): 0x5e9f81a9fae0c2d872f1a82fb4b6fc9832d2324f77b3aa6724971dffa4c3ca5d
+Account ID: 0x5e9f81a9fae0c2d872f1a82fb4b6fc9832d2324f77b3aa6724971dffa4c3ca5d
+Public key (SS58): 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+SS58 Address: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+
+
+========================= Account 01
+
+Secret phrase:       small town entire risk strategy lumber sick prison wish mule little forward
+  Network ID:        substrate
+  Secret seed:       0xf9bc6cf364be7a828ee1f48271d076c6ff1e50300f27b18c733899c59ee12ac8
+  Public key (hex):  0xe4ca75b8731b5833dc108bda587a996b56fb56b141317e1a7396e929777ef144
+  Account ID:        0xe4ca75b8731b5833dc108bda587a996b56fb56b141317e1a7396e929777ef144
+  Public key (SS58): 5HEgvCSNxm2B3iyAvLDYk3pC7ReoDrx51oSKUTETL6F2x2YY
+  SS58 Address:      5HEgvCSNxm2B3iyAvLDYk3pC7ReoDrx51oSKUTETL6F2x2YY
+
+Secret phrase:       small town entire risk strategy lumber sick prison wish mule little forward
+  Network ID:        substrate
+  Secret seed:       0xf9bc6cf364be7a828ee1f48271d076c6ff1e50300f27b18c733899c59ee12ac8
+  Public key (hex):  0x0975117ba73994f7373351d2d65a515a58bb303e69cd19d3995b1617f3c23070
+  Account ID:        0x0975117ba73994f7373351d2d65a515a58bb303e69cd19d3995b1617f3c23070
+  Public key (SS58): 5CH74hoWfrv94fAD1oPGMM9WbxrENGraphkDuqR2ts9qeJc8
+  SS58 Address:      5CH74hoWfrv94fAD1oPGMM9WbxrENGraphkDuqR2ts9qeJc8
+
+
+12D3KooWPsT55qaUmFYxpKmYKVBqCgbe9J8tZQn3jvgFB7xQSaSC
+98abf702a70f903a16be1f44fb264f5e1f8c684470b77d7d917efbfe0281cd34
+
+  ./target/release/elysium \
+    --base-path ./tmp/node01 \
+    --chain ./customSpecSRaw.json \
+    --port 30335 \
+    --ws-port 9946 \
+    --rpc-port 9935 \
+    --validator \
+    --rpc-methods Unsafe \
+    --name MyNode01 \
+    --ws-external \
+    --rpc-external \
+    --rpc-cors all
+    --node-key 98abf702a70f903a16be1f44fb264f5e1f8c684470b77d7d917efbfe0281cd34
+
+  ./target/release/elysium key insert --base-path ./tmp/node01 \
+  --chain ./customSpecSRaw.json \
+  --scheme Sr25519 \
+  --suri "small town entire risk strategy lumber sick prison wish mule little forward" \
+  --key-type aura
+
+  ./target/release/elysium key insert --base-path ./tmp/node01 \
+  --chain ./customSpecSRaw.json \
+  --scheme Ed25519 \
+  --suri "small town entire risk strategy lumber sick prison wish mule little forward" \
+  --key-type gran
+
+
+======================= Account 02
+
+Secret phrase:       coin dentist dwarf march decide bitter fabric admit chair dose animal garment
+  Network ID:        substrate
+  Secret seed:       0x31d543f5ee538ee1b325e6c9b6fff173f60f92d18b8223b0e88ce70fa2f8ec43
+  Public key (hex):  0x2e913d8f7a339770fdfd70a474e30de2bed5d2ece5aea8bcf0f2c2f2ee6e2320
+  Account ID:        0x2e913d8f7a339770fdfd70a474e30de2bed5d2ece5aea8bcf0f2c2f2ee6e2320
+  Public key (SS58): 5D7mCrqwQzoUhSXJyXbxeFT9QNLtPZECRmCqHygvKTXJUze2
+  SS58 Address:      5D7mCrqwQzoUhSXJyXbxeFT9QNLtPZECRmCqHygvKTXJUze2
+
+Secret phrase:       coin dentist dwarf march decide bitter fabric admit chair dose animal garment
+  Network ID:        substrate
+  Secret seed:       0x31d543f5ee538ee1b325e6c9b6fff173f60f92d18b8223b0e88ce70fa2f8ec43
+  Public key (hex):  0xbaade9cc50ffafc1072040adeb356bc4a34782aab23bc06a15e6aef635548c4e
+  Account ID:        0xbaade9cc50ffafc1072040adeb356bc4a34782aab23bc06a15e6aef635548c4e
+  Public key (SS58): 5GHURhqWnJ27rNK9VhMvWXH9W5yeAAVzuLhoH59aN4gedcLi
+  SS58 Address:      5GHURhqWnJ27rNK9VhMvWXH9W5yeAAVzuLhoH59aN4gedcLi
+
+
+12D3KooWCcXg7F6upWR3q1XMTFUuLFp7tX1TDjjWZqKas7jAiRys
+e9916ad8fb64425fcf873815459ac9078cf94c2df03cf309ca93ab641929ac1b
+
+./target/release/elysium --chain=customSpecSRaw.json --base-path /tmp/validator1 --alice --node-key=c12b6d18942f5ee8528c8e2baf4e147b5c5c18710926ea492d09cbd9f6c9f82a  --port 30333  --ws-port 9944  --rpc-port 9933  --rpc-methods Unsafe --rpc-external  --rpc-cors=all --unsafe-rpc-external --unsafe-ws-external --pruning archive
+
+./target/release/elysium --chain=customSpecSRaw.json --base-path /tmp/validator2 --bob --node-key=6ce3be907dbcabf20a9a5a60a712b4256a54196000a8ed4050d352bc113f8c58  --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2 --port 30334 --rpc-port 9945
