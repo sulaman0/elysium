@@ -72,9 +72,8 @@ cargo build --release --locked
 To run the Elysium you need to have ubuntu 20.04 installed. Follow these steps to set up rust for building the repo.
 
 ```bash
-sudo apt install build-essential
-sudo apt install --assume-yes git clang curl libssl-dev protobuf-compiler
-sudo apt install --assume-yes git clang curl libssl-dev llvm libudev-dev make protobuf-compiler
+sudo apt update
+sudo apt install --assume-yes build-essential git clang curl libssl-dev protobuf-compiler llvm libudev-dev make
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 #Follow the prompts displayed to proceed with a default installation.
