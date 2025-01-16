@@ -10,5 +10,5 @@ This file contains changelogs that made in this specific branch
 7. Upgrade chain code to v0.9.42
 8. Introduce WeightV2 of POV in Blocks
 9. Handle polkadot{.js} block details page requirements
-10. Initiate POV size inside Blocks
+10. Initiate POV size inside Blocks.
 11. Disable Elysium user generate coins function inside pallet >  elysium > lib.rs > generate_users_coins
