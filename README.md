@@ -1,8 +1,10 @@
 # ![Elysium](https://cdn.elysiumchain.tech/elysium-chain-meta-image.png)
 
 # Information
-**A [FRAME](https://substrate.dev/docs/en/next/conceptual/runtime/frame)-based
-[Substrate](https://substrate.dev/en/) node with the Ethereum RPC support developed By Elysium Team.**
+**An Ethereum compatible Chain built with the [Polkadot-SDK](https://github.com/paritytech/polkadot-sdk).**
+
+👉 _Discover the Elysium project at [elysium.network](https://docs.elysiumchain.tech/docs/network-endpoints)._<br>
+👉 _Learn to [use the Elysium network](https://docs.elysiumchain.tech/docs/intro) with our technical docs._<br>
 
 ## Run Elysium Local Development Node with Docker
 
@@ -42,10 +44,10 @@ Substrate's canonical mnemonic: `bottom drive obey lake curtain smoke basket hol
 
 Mainnet tokens are only available for those people who are bridging their assets from Polygon to [Elysium using Bridge](https://bridge.elysiumchain.tech).
 
-| Network  | URL	                                                                                           | 
-|----------|------------------------------------------------------------------------------------------------|
-| Atlantis | The https://faucet.atlantischain.network/ website. The faucet dispenses 1 ELY every 24 hours   | 
-| Elysium  | The https://faucet.elysiumchain.tech/ website. The faucet dispenses 3 ELY for one time.        |
+| Network  | URL	                                                                                                            | 
+|----------|-----------------------------------------------------------------------------------------------------------------|
+| Atlantis | The [Faucet Atlantis](https://faucet.atlantischain.network/) website. The faucet dispenses 1 ELY every 24 hours | 
+| Elysium  | The [Faucet Elysium](https://faucet.elysiumchain.tech/) website. The faucet dispenses 3 ELY for one time.       |
 
 ## Build the Elysium Node
 
@@ -66,7 +68,6 @@ cargo build --release --locked
 
 ```
 
-### System Requirements
 ## Install required packages and Rust
 To run the Elysium you need to have ubuntu 20.04 installed. Follow these steps to set up rust for building the repo.
 
@@ -134,7 +135,7 @@ From Polkadot-SDK:
 
 - _Utility_: Allows users to use derivative accounts, and batch calls
 - _Balances_: Tracks ELY token balances
-- _Sudo_: Allows a privileged account to make arbitrary runtime changes. This will be removed before launch.
+- _Sudo_: Allows a privileged account to make arbitrary runtime changes. This will be removed by Governance.
 - _Timestamp_: On-Chain notion of time
 - _Transaction Payment_: Transaction payment (fee) management
 - _Randomness Collective Flip_: A (mock) onchain randomness beacon, which will be replaced by parachain randomness by mainnet.
