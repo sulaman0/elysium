@@ -11,7 +11,6 @@ pub mod pallet {
     // use sp_std::vec::Vec;
 
     use sp_runtime::{
-        traits::{CheckedAdd, Saturating, Zero},
         DispatchResult,
     };
 
