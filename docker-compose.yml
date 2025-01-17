@@ -3,8 +3,7 @@ version: '3'
 services:
   elysium-node:
     container_name: elysium-node
-    #image: intellicoworks/elysium:latest
-    image: slmnvaival/elysium-chain:1
+    image: vaival/elysium:8
     ports:
       - 30333:30333 # p2p port
       - 9933:9933 # rpc port
