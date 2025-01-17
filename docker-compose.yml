@@ -17,7 +17,7 @@ services:
       "--rpc-methods=Safe",
       "--unsafe-ws-external",
       "--prometheus-external",
-      "--node-key", "ed12f00f049d73e8573c5567317fdb5d5d93b2a06e4f9e3d1da4fd914ca9566f",
+      "--node-key", "",
       "--chain", "/usr/local/bin/elysiumSpecRaw.json",
       "--bootnodes", "/ip4/149.56.24.141/tcp/30333/p2p/12D3KooWGRwF66g11uFWzRHHcfj5gehnFj1oXRHdwnJ1dGa2Nai3",
       "--offchain-worker","always",
