@@ -52,6 +52,7 @@ USER elysium
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder --chown=elysium /elysium/target/release/elysium /elysium/elysium
+COPY --from=builder --chown=elysium /elysium/elysiumSpecRaw.json /usr/local/bin/
 
 RUN chmod uog+x /elysium/elysium
 # 30333 for parachain p2p
