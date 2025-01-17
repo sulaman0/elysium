@@ -51,8 +51,9 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /elysium elysium && \
 USER elysium
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=builder --chown=moonbeam /elysium/target/release/elysium /elysium/elysium
+COPY --from=builder --chown=elysium /elysium/target/release/elysium /elysium/elysium
 
+RUN chmod uog+x /elysium/elysium
 # 30333 for parachain p2p
 # 30334 for relaychain p2p
 # 9944 for Websocket & RPC call
