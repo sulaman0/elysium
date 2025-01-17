@@ -36,9 +36,9 @@ FROM debian:stable-slim
 LABEL description="Multistage Docker image for Elysium | The Green Blockchain for AI, Metaverse and web3 Game Projects" \
 	io.parity.image.type="mainnet" \
 	io.parity.image.authors="faraz.ahmad@vaivaltech.com" \
-	io.parity.image.vendor="BloxBytes" \
+	io.parity.image.vendor="Elysium Foundation" \
 	io.parity.image.description="Elysium | The Green Blockchain for AI, Metaverse and web3 Game Projects" \
-	io.parity.image.source="https://hub.docker.com/repository/docker/intellicoworks" \
+	io.parity.image.source="https://github.com/elysium-foundation/elysium" \
 	io.parity.image.documentation="https://docs.elysiumchain.tech/"
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /elysium elysium && \
