@@ -287,12 +287,14 @@ parameter_types! {
 	pub const ExistentialDeposit: u128 = 500;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
-	pub const MaxLocks: u32 = 50;
+    pub const MaxLocks: u32 = 50;
+	pub const MaxReserves: u32 = 50;
 }
 impl pallet_balances::Config for Runtime {
     /// The ubiquitous event type.
     type RuntimeEvent = RuntimeEvent;
-    // type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>; //comment
+    type RuntimeHoldReason = RuntimeHoldReason;
+    type RuntimeFreezeReason = RuntimeFreezeReason;
     type WeightInfo = ();
     /// The type for recording an account's balance.
     type Balance = Balance;
@@ -300,12 +302,10 @@ impl pallet_balances::Config for Runtime {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type ReserveIdentifier = [u8; 8];
-    type HoldIdentifier = ();
-    type FreezeIdentifier = ();
+    type FreezeIdentifier = RuntimeFreezeReason;
     type MaxLocks = MaxLocks;
-    type MaxReserves = ();
-    type MaxHolds = ();
-    type MaxFreezes = ();
+    type MaxReserves = MaxReserves;
+    type MaxFreezes = ConstU32<1>;
 }
 
 pub struct LengthToFee;
