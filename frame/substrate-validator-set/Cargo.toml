@@ -1,34 +1,92 @@
 [package]
 name = 'substrate-validator-set'
-version = '0.9.30'
+version = '1.1.0'
 authors = ['Gautam Dhameja <quasijatt@outlook.com>']
-edition = { workspace = true }
+edition = '2021'
 license = 'Apache-2.0'
-repository = { workspace = true }
+repository = 'https://github.com/gautamdhameja/substrate-validator-set'
 
-[dev-dependencies]
-serde = { workspace = true }
+[dev-dependencies.serde]
+features = ['derive']
+version = '1.0.188'
 
-[dependencies]
-sp-core = { workspace = true }
-sp-io = { workspace = true }
-sp-runtime = { workspace = true }
-sp-std = { workspace = true }
-log = { workspace = true }
-scale-codec = { package = "parity-scale-codec", workspace = true }
-scale-info = { workspace = true }
-syn = { workspace = true }
-sp-staking = { workspace = true }
-frame-benchmarking = { workspace = true, optional = true }
-frame-support = { workspace = true }
-frame-system = { workspace = true }
-pallet-session = { workspace = true, features = ['historical'] }
+[dev-dependencies.sp-state-machine]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.sp-core]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.sp-io]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.sp-staking]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.log]
+default-features = false
+version = '0.4.17'
+
+[dependencies.codec]
+default-features = false
+features = ['derive']
+package = 'parity-scale-codec'
+version = '3.0.0'
+
+[dependencies.frame-benchmarking]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+optional = true
+tag = 'polkadot-v1.8.0'
+
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.pallet-session]
+default-features = false
+features = ['historical']
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '2.1.1'
+
+[dependencies.sp-weights]
+default-features = false
+git = 'https://github.com/paritytech/polkadot-sdk.git'
+tag = 'polkadot-v1.8.0'
 
 [features]
 default = ['std']
-runtime-benchmarks = ['frame-benchmarking']
+runtime-benchmarks = ['frame-benchmarking/runtime-benchmarks']
 std = [
-    'scale-codec/std',
+    'codec/std',
     'frame-benchmarking/std',
     'frame-support/std',
     'frame-system/std',
@@ -37,6 +95,6 @@ std = [
     'sp-io/std',
     'sp-std/std',
     'sp-runtime/std',
-    'pallet-session/std'
+    'pallet-session/std',
 ]
 try-runtime = ['frame-support/try-runtime']

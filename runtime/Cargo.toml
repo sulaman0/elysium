@@ -49,7 +49,7 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 pallet-multisig = { workspace = true }
 pallet-node-authorization = { workspace = true }
 pallet-session = { workspace = true }
-pallet-elysium = { workspace = true }
+#pallet-elysium = { workspace = true }
 substrate-validator-set = { workspace = true }
 pallet-authorship = { workspace = true }
 
@@ -129,7 +129,7 @@ std = [
     "pallet-hotfix-sufficients/std",
     'pallet-multisig/std',
     'pallet-node-authorization/std',
-    'pallet-elysium/std',
+#    'pallet-elysium/std',
     'substrate-validator-set/std',
     'pallet-session/std',
     'log/std'

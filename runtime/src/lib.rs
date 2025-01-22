@@ -523,13 +523,13 @@ impl frame_support::traits::Get<&'static str> for VersionConstant {
         "v0.9.42 - https://github.com/VForged/elysium/tree/fa5f94e5e9b6f48ed846da0dbe2cc6c5f7d171e2"
     }
 }
-impl pallet_elysium::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
-    type Currency = Balances;
-    type RandomnessSource = RandomnessCollectiveFlip;
-    type MaximumSupply = MaximumSupply;
-    type CurrentVersion = VersionConstant;
-}
+// impl pallet_elysium::Config for Runtime {
+//     type RuntimeEvent = RuntimeEvent;
+//     type Currency = Balances;
+//     type RandomnessSource = RandomnessCollectiveFlip;
+//     type MaximumSupply = MaximumSupply;
+//     type CurrentVersion = VersionConstant;
+// }
 
 parameter_types! {
 	// One storage item; key size is 32; value is size 4+4+16+32 bytes = 56 bytes.
