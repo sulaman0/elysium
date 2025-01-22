@@ -517,20 +517,6 @@ parameter_types! {
 	pub const MaximumSupply: Balance = 1_000_000_000 *currency::LAVA; // 1 Billion LAVA
 }
 
-pub struct VersionConstant;
-impl frame_support::traits::Get<&'static str> for VersionConstant {
-    fn get() -> &'static str {
-        "v0.9.42 - https://github.com/VForged/elysium/tree/fa5f94e5e9b6f48ed846da0dbe2cc6c5f7d171e2"
-    }
-}
-// impl pallet_elysium::Config for Runtime {
-//     type RuntimeEvent = RuntimeEvent;
-//     type Currency = Balances;
-//     type RandomnessSource = RandomnessCollectiveFlip;
-//     type MaximumSupply = MaximumSupply;
-//     type CurrentVersion = VersionConstant;
-// }
-
 parameter_types! {
 	// One storage item; key size is 32; value is size 4+4+16+32 bytes = 56 bytes.
 	pub const DepositBase: Balance = currency::deposit(1, 88);
@@ -593,7 +579,6 @@ construct_runtime!(
 
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
-		Elysium: pallet_elysium,
 		Ethereum: pallet_ethereum,
 		EVM: pallet_evm,
 		EVMChainId: pallet_evm_chain_id,
