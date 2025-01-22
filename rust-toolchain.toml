@@ -13,7 +13,6 @@
 #targets = [ "wasm32-unknown-unknown" ]
 #profile = "minimal"
 
-
 [toolchain]
 # Stable
 #channel = "1.68.2" # rustc 1.68.2 (9eb3afe9e 2023-03-27)
