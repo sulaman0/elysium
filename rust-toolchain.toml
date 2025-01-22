@@ -17,7 +17,7 @@
 # Stable
 #channel = "1.68.2" # rustc 1.68.2 (9eb3afe9e 2023-03-27)
 # Nightly
-channel = "nightly-2024-10-25" # rustc 1.67.4-nightly (a00f8ba7f 2022-11-15)
+channel = "nightly-2024-10-25" # rustc 1.67.5-nightly (a00f8ba7f 2022-11-15)
 #components = ["rustfmt", "clippy"]
 components = [
 	"cargo",
