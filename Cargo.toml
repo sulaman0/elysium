@@ -140,6 +140,7 @@ sp-staking = { git = "https://github.com/paritytech/polkadot-sdk", branch = "rel
 sp-database = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0" }
 prometheus-endpoint = { package = "substrate-prometheus-endpoint", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0" }
 sp-storage = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
+sp-weights = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
 
 # Substrate FRAME
 frame-executive = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
