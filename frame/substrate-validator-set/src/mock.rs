@@ -132,8 +132,8 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	validator_set::GenesisConfig::<Test> {
 		initial_validators: keys.iter().map(|x| x.0).collect::<Vec<_>>(),
 	}
-	.assimilate_storage(&mut t)
-	.unwrap();
+		.assimilate_storage(&mut t)
+		.unwrap();
 	pallet_session::GenesisConfig::<Test> { keys: keys.clone() }
 		.assimilate_storage(&mut t)
 		.unwrap();

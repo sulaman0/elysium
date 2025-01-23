@@ -6,87 +6,31 @@ edition = '2021'
 license = 'Apache-2.0'
 repository = 'https://github.com/gautamdhameja/substrate-validator-set'
 
-[dev-dependencies.serde]
-features = ['derive']
-version = '1.0.188'
 
-[dev-dependencies.sp-state-machine]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
+[dev-dependencies]
+serde = { workspace = true, features = ['derive'] }
+sp-state-machine = { workspace = true }
 
-[dependencies.sp-core]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.sp-io]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.sp-runtime]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.sp-std]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.sp-staking]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.log]
-default-features = false
-version = '0.4.17'
-
-[dependencies.codec]
-default-features = false
-features = ['derive']
-package = 'parity-scale-codec'
-version = '3.0.0'
-
-[dependencies.frame-benchmarking]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-optional = true
-tag = 'polkadot-v1.8.0'
-
-[dependencies.frame-support]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.frame-system]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.pallet-session]
-default-features = false
-features = ['historical']
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
-
-[dependencies.scale-info]
-default-features = false
-features = ['derive']
-version = '2.1.1'
-
-[dependencies.sp-weights]
-default-features = false
-git = 'https://github.com/paritytech/polkadot-sdk.git'
-tag = 'polkadot-v1.8.0'
+[dependencies]
+sp-core = { workspace = true, default-features = false }
+sp-io = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false }
+sp-std = { workspace = true, default-features = false }
+sp-staking = { workspace = true, default-features = false }
+log = { workspace = true }
+scale-codec = { workspace = true, package = 'parity-scale-codec', features = ['derive'] }
+frame-benchmarking = { workspace = true, optional = true, default-features = false }
+frame-support = { workspace = true, default-features = false }
+frame-system = { workspace = true, default-features = false }
+pallet-session = { workspace = true, default-features = false, features = ['historical'] }
+scale-info = { workspace = true, default-features = false, features = ['derive'] }
+sp-weights = { workspace = true, default-features = false }
 
 [features]
 default = ['std']
 runtime-benchmarks = ['frame-benchmarking/runtime-benchmarks']
 std = [
-    'codec/std',
+    'scale-codec/std',
     'frame-benchmarking/std',
     'frame-support/std',
     'frame-system/std',
