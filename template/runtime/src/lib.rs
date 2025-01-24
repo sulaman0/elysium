@@ -522,8 +522,7 @@ impl pallet_grandpa::Config for Runtime {
 // Purpose:
 // Properties:
 // ==============================
-// impl pallet_insecure_randomness_collective_flip::Config for Runtime {}
-
+impl pallet_insecure_randomness_collective_flip::Config for Runtime {}
 
 // ==============================
 // @@ Construct Runtime  @@
@@ -534,12 +533,14 @@ frame_support::construct_runtime!(
 	pub enum Runtime {
 		System: frame_system,
 		Timestamp: pallet_timestamp,
-        // RandomnessCollectiveFlip: pallet_insecure_randomness_collective_flip,
-		Aura: pallet_aura,
-		Grandpa: pallet_grandpa,
+        RandomnessCollectiveFlip: pallet_insecure_randomness_collective_flip,
+
 		Balances: pallet_balances,
         ValidatorSet: substrate_validator_set,
         Session: pallet_session,
+		Aura: pallet_aura,
+		Grandpa: pallet_grandpa,
+
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		Ethereum: pallet_ethereum,
