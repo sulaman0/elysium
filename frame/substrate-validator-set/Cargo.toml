@@ -1,0 +1,44 @@
+[package]
+name = 'substrate-validator-set'
+version = '1.1.0'
+authors = ['Gautam Dhameja <quasijatt@outlook.com>']
+edition = '2021'
+license = 'Apache-2.0'
+repository = 'https://github.com/gautamdhameja/substrate-validator-set'
+
+
+[dev-dependencies]
+serde = { workspace = true, features = ['derive'] }
+sp-state-machine = { workspace = true }
+
+[dependencies]
+sp-core = { workspace = true, default-features = false }
+sp-io = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false }
+sp-std = { workspace = true, default-features = false }
+sp-staking = { workspace = true, default-features = false }
+log = { workspace = true }
+scale-codec = { workspace = true, package = 'parity-scale-codec', features = ['derive'] }
+frame-benchmarking = { workspace = true, optional = true, default-features = false }
+frame-support = { workspace = true, default-features = false }
+frame-system = { workspace = true, default-features = false }
+pallet-session = { workspace = true, default-features = false, features = ['historical'] }
+scale-info = { workspace = true, default-features = false, features = ['derive'] }
+sp-weights = { workspace = true, default-features = false }
+
+[features]
+default = ['std']
+runtime-benchmarks = ['frame-benchmarking/runtime-benchmarks']
+std = [
+    'scale-codec/std',
+    'frame-benchmarking/std',
+    'frame-support/std',
+    'frame-system/std',
+    'scale-info/std',
+    'sp-core/std',
+    'sp-io/std',
+    'sp-std/std',
+    'sp-runtime/std',
+    'pallet-session/std',
+]
+try-runtime = ['frame-support/try-runtime']
