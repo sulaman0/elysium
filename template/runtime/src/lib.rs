@@ -92,20 +92,15 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 pub type AccountIndex = u32;
 /// Balance of an account.
 pub type Balance = u128;
-
 /// Index of a transaction in the chain.
 pub type Nonce = u32;
 pub type Index = u32;
-
 /// A hash of some data used by the chain.
 pub type Hash = H256;
-
 /// The hashing algorithm used by the chain.
 pub type Hashing = BlakeTwo256;
-
 /// Digest item type.
 pub type DigestItem = generic::DigestItem;
-
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -140,11 +135,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     state_version: 1,
 };
 
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
-pub const SLOT_DURATION: u64 = MILLISECS_PER_BLOCK;
-
+pub const MILLISECOND_PER_BLOCK: u64 = 6000;
+pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
 // Time is measured by number of blocks.
-pub const MINUTES: BlockNumber = 60_000 / (MILLISECS_PER_BLOCK as BlockNumber);
+pub const MINUTES: BlockNumber = 60_000 / (MILLISECOND_PER_BLOCK as BlockNumber);
 pub const HOURS: BlockNumber = MINUTES * 60;
 pub const DAYS: BlockNumber = HOURS * 24;
 
@@ -159,9 +153,9 @@ pub fn native_version() -> sp_version::NativeVersion {
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2000ms of compute with a 6 second average block time.
-pub const WEIGHT_MILLISECS_PER_BLOCK: u64 = 2000;
+pub const WEIGHT_MILLISECOND_PER_BLOCK: u64 = 2000;
 pub const MAXIMUM_BLOCK_WEIGHT: Weight = Weight::from_parts(
-    WEIGHT_MILLISECS_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS,
+    WEIGHT_MILLISECOND_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS,
     u64::MAX,
 );
 pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
@@ -339,7 +333,7 @@ parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECS_PER_BLOCK), 0);
+	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECOND_PER_BLOCK), 0);
 	pub SuicideQuickClearLimit: u32 = 0;
 }
 
