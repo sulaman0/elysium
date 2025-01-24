@@ -22,9 +22,9 @@ use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{
         AccountIdLookup, BlakeTwo256, Block as BlockT, DispatchInfoOf, Dispatchable, Get, IdentifyAccount,
-        IdentityLookup, NumberFor, One, PostDispatchInfoOf, UniqueSaturatedInto, Verify,
+        NumberFor, One, PostDispatchInfoOf, UniqueSaturatedInto, Verify, OpaqueKeys
     },
-    transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError}, FixedPointNumber, MultiSignature, Perquintill,
+    transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError}, MultiSignature,
     ApplyExtrinsicResult, ConsensusEngineId, Perbill, Permill,
 };
 use sp_std::{marker::PhantomData, prelude::*};
@@ -34,11 +34,10 @@ use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
 use frame_support::{
     genesis_builder_helper::{build_config, create_default_config},
     parameter_types,
-    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize, OnTimestampSet},
+    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize},
     weights::{constants::WEIGHT_REF_TIME_PER_MILLIS, IdentityFee, Weight},
 };
-use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, TargetedFeeAdjustment, Multiplier};
-use fp_account::EthereumSignature;
+use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, Multiplier};
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
@@ -46,19 +45,20 @@ use pallet_ethereum::{
     TransactionData,
 };
 use pallet_evm::{
-    Account as EVMAccount, EnsureAddressTruncated, EnsureAccountId20, FeeCalculator, HashedAddressMapping, IdentityAddressMapping, Runner,
+    Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
 };
+use frame_system::EnsureRoot;
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
 mod precompiles;
 use precompiles::FrontierPrecompiles;
 
-/**
-* @@ Define Types @@
-* Purpose:
-* Properties:
-*/
+
+// @@ Define Types @@
+// Purpose:
+// Properties:
+
 pub type BlockNumber = u32;
 pub type Signature = MultiSignature;
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
@@ -69,12 +69,12 @@ pub type Index = u32;
 pub type Hash = H256;
 pub type Hashing = BlakeTwo256;
 pub type DigestItem = generic::DigestItem;
+pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 
-/**
-* @@ Define Constants @@
-* Purpose:
-* Properties:
-*/
+// @@ Define Constants @@
+// Purpose:
+// Properties:
+
 pub const MILLISECOND_PER_BLOCK: u64 = 6000;
 pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
 // Time is measured by number of blocks.
@@ -88,11 +88,9 @@ pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
 pub const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 pub const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 
-/**
-* @@ Currency @@
-* Purpose:
-* Properties:
-*/
+// @@ Currency @@
+// Purpose:
+// Properties:
 pub mod currency {
     use super::Balance;
 
@@ -113,11 +111,9 @@ pub mod currency {
     }
 }
 
-/**
-* @@ Runtime Version @@
-* Purpose:
-* Properties:
-*/
+// @@ Runtime Version @@
+// Purpose:
+// Properties:
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("elysium"),
@@ -130,11 +126,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     state_version: 1,
 };
 
-/**
-* @@ Opaque @@
-* Purpose:
-* Properties:
-*/
+// @@ Opaque @@
+// Purpose:
+// Properties:
+
 pub mod opaque {
     use super::*;
     pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
@@ -153,11 +148,10 @@ pub mod opaque {
 	}
 }
 
-/**
-* @@ Native Version of Chain @@
-* Purpose:
-* Properties:
-*/
+// @@ Native Version of Chain @@
+// Purpose:
+// Properties:
+
 #[cfg(feature = "std")]
 pub fn native_version() -> sp_version::NativeVersion {
     sp_version::NativeVersion {
@@ -166,11 +160,9 @@ pub fn native_version() -> sp_version::NativeVersion {
     }
 }
 
-/**
-* @@ Pallet Frame System @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Frame System @@
+// Purpose
+// Properties
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 256;
@@ -232,11 +224,9 @@ impl frame_system::Config for Runtime {
     type MaxConsumers = ConstU32<16>;
 }
 
-/**
-* @@ Pallet Aura @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Aura @@
+// Purpose:
+// Properties:
 parameter_types! {
 	pub const MaxAuthorities: u32 = 100;
 }
@@ -247,11 +237,9 @@ impl pallet_aura::Config for Runtime {
     type AllowMultipleBlocksPerSlot = ConstBool<false>;
 }
 
-/**
-* @@ Pallet Grandpa @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Grandpa @@
+// Purpose:
+// Properties:
 impl pallet_grandpa::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = ();
@@ -262,11 +250,10 @@ impl pallet_grandpa::Config for Runtime {
     type EquivocationReportSystem = ();
 }
 
-/**
-* @@ Pallet Timestamp @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Timestamp @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 	pub storage EnableManualSeal: bool = false;
@@ -278,11 +265,10 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = ();
 }
 
-/**
-* @@ Pallet Balance @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Balance @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub const ExistentialDeposit: u128 = 0;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
@@ -306,11 +292,10 @@ impl pallet_balances::Config for Runtime {
     type MaxFreezes = ConstU32<1>;
 }
 
-/**
-* @@ Pallet Transaction Payment @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Transaction Payment @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
 }
@@ -323,22 +308,20 @@ impl pallet_transaction_payment::Config for Runtime {
     type OperationalFeeMultiplier = ConstU8<5>;
 }
 
-/**
-* @@ Pallet Sudo @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Sudo @@
+// Purpose:
+// Properties:
+
 impl pallet_sudo::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeCall = RuntimeCall;
     type WeightInfo = pallet_sudo::weights::SubstrateWeight<Self>;
 }
 
-/**
-* @@ Pallet EVM Chain ID @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet EVM Chain ID @@
+// Purpose:
+// Properties:
+
 impl pallet_evm_chain_id::Config for Runtime {}
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
@@ -355,11 +338,10 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     }
 }
 
-/**
-* @@ Pallet EVM @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet EVM @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
@@ -391,11 +373,10 @@ impl pallet_evm::Config for Runtime {
     type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;
 }
 
-/**
-* @@ Pallet Ethereum @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Ethereum @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub const PostBlockAndTxnHashes: PostLogContent = PostLogContent::BlockAndTxnHashes;
 }
@@ -406,11 +387,10 @@ impl pallet_ethereum::Config for Runtime {
     type ExtraDataLength = ConstU32<30>;
 }
 
-/**
-* @@ Pallet Dynamic Fee @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Dynamic Fee @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub BoundDivision: U256 = U256::from(1024);
 }
@@ -418,11 +398,10 @@ impl pallet_dynamic_fee::Config for Runtime {
     type MinGasPriceBoundDivisor = BoundDivision;
 }
 
-/**
-* @@ Pallet Base Fee @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Base Fee @@
+// Purpose:
+// Properties:
+
 parameter_types! {
 	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
@@ -447,21 +426,52 @@ impl pallet_base_fee::Config for Runtime {
     type DefaultElasticity = DefaultElasticity;
 }
 
-/**
-* @@ Pallet HotFix Sufficient  @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet HotFix Sufficient  @@
+// Purpose:
+// Properties:
+
 impl pallet_hotfix_sufficients::Config for Runtime {
     type AddressMapping = HashedAddressMapping<BlakeTwo256>;
     type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Self>;
 }
 
-/**
-* @@ Construct Runtime  @@
-* Purpose:
-* Properties:
-*/
+// @@ Pallet Substrate Validator Set  @@
+// Purpose:
+// Properties:
+
+parameter_types! {
+	pub const MinAuthorities: u32 = 1;
+}
+impl substrate_validator_set::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type AddRemoveOrigin = EnsureRoot<AccountId>;
+    type MinAuthorities = MinAuthorities;
+    type WeightInfo = substrate_validator_set::weights::SubstrateWeight<Runtime>;
+}
+
+// @@ Pallet Session  @@
+// Purpose:
+// Properties:
+parameter_types! {
+	pub const Period: u32 = 2 * MINUTES;
+	pub const Offset: u32 = 0;
+}
+impl pallet_session::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type ValidatorId = <Self as frame_system::Config>::AccountId;
+    type ValidatorIdOf = substrate_validator_set::ValidatorOf<Self>;
+    type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
+    type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+    type SessionManager = ValidatorSet;
+    type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+    type Keys = opaque::SessionKeys;
+    type WeightInfo = ();
+}
+
+// @@ Construct Runtime  @@
+// Purpose:
+// Properties:
+
 frame_support::construct_runtime!(
 	pub enum Runtime {
 		System: frame_system,
@@ -469,6 +479,8 @@ frame_support::construct_runtime!(
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
 		Balances: pallet_balances,
+        ValidatorSet: substrate_validator_set,
+        Session: pallet_session,
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		Ethereum: pallet_ethereum,
@@ -505,7 +517,6 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
 }
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
-pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 pub type SignedExtra = (
