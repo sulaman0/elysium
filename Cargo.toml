@@ -44,6 +44,7 @@ edition = "2021"
 repository = "https://github.com/paritytech/frontier/"
 
 [workspace.dependencies]
+smallvec = "1.10.0"
 async-trait = "0.1"
 bn = { package = "substrate-bn", version = "0.6", default-features = false }
 clap = { version = "4.5", features = ["derive", "deprecated"] }
@@ -146,6 +147,9 @@ pallet-utility = { git = "https://github.com/paritytech/polkadot-sdk", branch = 
 pallet-authorship = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
 pallet-session = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
 pallet-insecure-randomness-collective-flip = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
+pallet-node-authorization = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
+pallet-multisig = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0", default-features = false }
+
 # Substrate Utility
 frame-benchmarking-cli = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0" }
 prometheus-endpoint = { package = "substrate-prometheus-endpoint", git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.8.0" }
