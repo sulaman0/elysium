@@ -1,6 +1,6 @@
 [package]
 name = "elysium"
-version = "8.0.0"
+version = "12.0.0"
 license = "Unlicense"
 build = "build.rs"
 description = "A fresh FRAME-based Substrate node, ready for hacking."

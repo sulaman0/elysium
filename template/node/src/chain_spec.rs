@@ -1,6 +1,4 @@
 use std::{collections::BTreeMap, str::FromStr};
-
-use hex_literal::hex;
 // Substrate
 use sc_chain_spec::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -12,7 +10,7 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use elysium_runtime::{
 	AccountId, Balance, RuntimeGenesisConfig, SS58Prefix, Signature, WASM_BINARY,
 };
-use sp_core::{sr25519, Pair, Public, H160, U256, OpaquePeerId};
+use sp_core::{sr25519, Pair, Public, H160, U256};
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
