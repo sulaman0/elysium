@@ -52,13 +52,14 @@ pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
 mod precompiles;
+mod impls;
 use precompiles::FrontierPrecompiles;
 
-
+// ==============================
 // @@ Define Types @@
 // Purpose:
 // Properties:
-
+// ==============================
 pub type BlockNumber = u32;
 pub type Signature = MultiSignature;
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
@@ -71,10 +72,11 @@ pub type Hashing = BlakeTwo256;
 pub type DigestItem = generic::DigestItem;
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 
+// ==============================
 // @@ Define Constants @@
 // Purpose:
 // Properties:
-
+// ==============================
 pub const MILLISECOND_PER_BLOCK: u64 = 6000;
 pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
 // Time is measured by number of blocks.
@@ -88,9 +90,11 @@ pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
 pub const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 pub const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 
+// ==============================
 // @@ Currency @@
 // Purpose:
 // Properties:
+// ==============================
 pub mod currency {
     use super::Balance;
 
@@ -111,9 +115,11 @@ pub mod currency {
     }
 }
 
+// ==============================
 // @@ Runtime Version @@
 // Purpose:
 // Properties:
+// ==============================
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("elysium"),
@@ -126,10 +132,11 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     state_version: 1,
 };
 
+// ==============================
 // @@ Opaque @@
 // Purpose:
 // Properties:
-
+// ==============================
 pub mod opaque {
     use super::*;
     pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
@@ -148,10 +155,11 @@ pub mod opaque {
 	}
 }
 
+// ==============================
 // @@ Native Version of Chain @@
 // Purpose:
 // Properties:
-
+// ==============================
 #[cfg(feature = "std")]
 pub fn native_version() -> sp_version::NativeVersion {
     sp_version::NativeVersion {
@@ -160,9 +168,11 @@ pub fn native_version() -> sp_version::NativeVersion {
     }
 }
 
+// ==============================
 // @@ Pallet Frame System @@
 // Purpose
 // Properties
+// ==============================
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 256;
@@ -224,9 +234,11 @@ impl frame_system::Config for Runtime {
     type MaxConsumers = ConstU32<16>;
 }
 
+// ==============================
 // @@ Pallet Aura @@
 // Purpose:
 // Properties:
+// ==============================
 parameter_types! {
 	pub const MaxAuthorities: u32 = 100;
 }
@@ -237,23 +249,11 @@ impl pallet_aura::Config for Runtime {
     type AllowMultipleBlocksPerSlot = ConstBool<false>;
 }
 
-// @@ Pallet Grandpa @@
-// Purpose:
-// Properties:
-impl pallet_grandpa::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
-    type WeightInfo = ();
-    type MaxAuthorities = ConstU32<32>;
-    type MaxNominators = ConstU32<0>;
-    type MaxSetIdSessionEntries = ();
-    type KeyOwnerProof = sp_core::Void;
-    type EquivocationReportSystem = ();
-}
-
+// ==============================
 // @@ Pallet Timestamp @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 	pub storage EnableManualSeal: bool = false;
@@ -265,10 +265,11 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = ();
 }
 
+// ==============================
 // @@ Pallet Balance @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub const ExistentialDeposit: u128 = 0;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
@@ -292,36 +293,39 @@ impl pallet_balances::Config for Runtime {
     type MaxFreezes = ConstU32<1>;
 }
 
+// ==============================
 // @@ Pallet Transaction Payment @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
 }
 impl pallet_transaction_payment::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
-    type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
+    type OnChargeTransaction = CurrencyAdapter<Balances, crate::impls::DealWithFees>;
     type WeightToFee = IdentityFee<Balance>;
     type LengthToFee = IdentityFee<Balance>;
     type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
     type OperationalFeeMultiplier = ConstU8<5>;
 }
 
+// ==============================
 // @@ Pallet Sudo @@
 // Purpose:
 // Properties:
-
+// ==============================
 impl pallet_sudo::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeCall = RuntimeCall;
     type WeightInfo = pallet_sudo::weights::SubstrateWeight<Self>;
 }
 
+// ==============================
 // @@ Pallet EVM Chain ID @@
 // Purpose:
 // Properties:
-
+// ==============================
 impl pallet_evm_chain_id::Config for Runtime {}
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
@@ -338,10 +342,11 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
     }
 }
 
+// ==============================
 // @@ Pallet EVM @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
@@ -373,10 +378,11 @@ impl pallet_evm::Config for Runtime {
     type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;
 }
 
+// ==============================
 // @@ Pallet Ethereum @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub const PostBlockAndTxnHashes: PostLogContent = PostLogContent::BlockAndTxnHashes;
 }
@@ -387,10 +393,11 @@ impl pallet_ethereum::Config for Runtime {
     type ExtraDataLength = ConstU32<30>;
 }
 
+// ==============================
 // @@ Pallet Dynamic Fee @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub BoundDivision: U256 = U256::from(1024);
 }
@@ -398,10 +405,11 @@ impl pallet_dynamic_fee::Config for Runtime {
     type MinGasPriceBoundDivisor = BoundDivision;
 }
 
+// ==============================
 // @@ Pallet Base Fee @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
@@ -426,19 +434,21 @@ impl pallet_base_fee::Config for Runtime {
     type DefaultElasticity = DefaultElasticity;
 }
 
+// ==============================
 // @@ Pallet HotFix Sufficient  @@
 // Purpose:
 // Properties:
-
+// ==============================
 impl pallet_hotfix_sufficients::Config for Runtime {
     type AddressMapping = HashedAddressMapping<BlakeTwo256>;
     type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Self>;
 }
 
+// ==============================
 // @@ Pallet Substrate Validator Set  @@
 // Purpose:
 // Properties:
-
+// ==============================
 parameter_types! {
 	pub const MinAuthorities: u32 = 1;
 }
@@ -449,9 +459,11 @@ impl substrate_validator_set::Config for Runtime {
     type WeightInfo = substrate_validator_set::weights::SubstrateWeight<Runtime>;
 }
 
+// ==============================
 // @@ Pallet Session  @@
 // Purpose:
 // Properties:
+// ==============================
 parameter_types! {
 	pub const Period: u32 = 2 * MINUTES;
 	pub const Offset: u32 = 0;
@@ -468,14 +480,61 @@ impl pallet_session::Config for Runtime {
     type WeightInfo = ();
 }
 
+// ==============================
+// @@ Pallet Authorship @@
+// Purpose:
+// Properties:
+// ==============================
+pub struct AuraAccountAdapter;
+impl frame_support::traits::FindAuthor<AccountId> for AuraAccountAdapter {
+    fn find_author<'a, I>(digests: I) -> Option<AccountId>
+    where
+        I: 'a + IntoIterator<Item=(frame_support::ConsensusEngineId, &'a [u8])>,
+    {
+        pallet_aura::AuraAuthorId::<Runtime>::find_author(digests).and_then(|k| {
+            AccountId::try_from(k.as_ref()).ok()
+        })
+    }
+}
+impl pallet_authorship::Config for Runtime {
+    // type FindAuthor = AuraAccountAdapter;
+    type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
+    type EventHandler = ();
+}
+
+// ==============================
+// @@ Pallet Grandpa @@
+// Purpose:
+// Properties:
+// ==============================
+impl pallet_grandpa::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type WeightInfo = ();
+    type MaxAuthorities = ConstU32<32>;
+    type MaxNominators = ConstU32<0>;
+    type MaxSetIdSessionEntries = ();
+    type KeyOwnerProof = sp_core::Void;
+    type EquivocationReportSystem = ();
+}
+
+// ==============================
+// @@ Pallet Insure Randomness Collective Flip @@
+// Purpose:
+// Properties:
+// ==============================
+// impl pallet_insecure_randomness_collective_flip::Config for Runtime {}
+
+
+// ==============================
 // @@ Construct Runtime  @@
 // Purpose:
 // Properties:
-
+// ==============================
 frame_support::construct_runtime!(
 	pub enum Runtime {
 		System: frame_system,
 		Timestamp: pallet_timestamp,
+        // RandomnessCollectiveFlip: pallet_insecure_randomness_collective_flip,
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
 		Balances: pallet_balances,
@@ -489,12 +548,12 @@ frame_support::construct_runtime!(
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
 		HotfixSufficients: pallet_hotfix_sufficients,
+        Authorship: pallet_authorship,
 	}
 );
 
 #[derive(Clone)]
 pub struct TransactionConverter;
-
 impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
     fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> UncheckedExtrinsic {
         UncheckedExtrinsic::new_unsigned(
