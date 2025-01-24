@@ -29,9 +29,6 @@ use sp_runtime::{
 };
 use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::RuntimeVersion;
-// Substrate FRAME
-// #[cfg(feature = "with-paritydb-weights")]
-// use frame_support::weights::constants::ParityDbWeight as RuntimeDbWeight;
 #[cfg(feature = "with-rocksdb-weights")]
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
 use frame_support::{
@@ -41,7 +38,6 @@ use frame_support::{
     weights::{constants::WEIGHT_REF_TIME_PER_MILLIS, IdentityFee, Weight},
 };
 use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, TargetedFeeAdjustment, Multiplier};
-// Frontier
 use fp_account::EthereumSignature;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
@@ -52,58 +48,93 @@ use pallet_ethereum::{
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressTruncated, EnsureAccountId20, FeeCalculator, HashedAddressMapping, IdentityAddressMapping, Runner,
 };
-
-// A few exports that help ease life for downstream crates.
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
-
 mod precompiles;
 use precompiles::FrontierPrecompiles;
 
-// ELY is Native token with 18 decimal precision.
+/**
+* @@ Define Types @@
+* Purpose:
+* Properties:
+*/
+pub type BlockNumber = u32;
+pub type Signature = MultiSignature;
+pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
+pub type AccountIndex = u32;
+pub type Balance = u128;
+pub type Nonce = u32;
+pub type Index = u32;
+pub type Hash = H256;
+pub type Hashing = BlakeTwo256;
+pub type DigestItem = generic::DigestItem;
+
+/**
+* @@ Define Constants @@
+* Purpose:
+* Properties:
+*/
+pub const MILLISECOND_PER_BLOCK: u64 = 6000;
+pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
+// Time is measured by number of blocks.
+pub const MINUTES: BlockNumber = 60_000 / (MILLISECOND_PER_BLOCK as BlockNumber);
+pub const HOURS: BlockNumber = MINUTES * 60;
+pub const DAYS: BlockNumber = HOURS * 24;
+const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+pub const WEIGHT_MILLISECOND_PER_BLOCK: u64 = 2000;
+pub const MAXIMUM_BLOCK_WEIGHT: Weight = Weight::from_parts(WEIGHT_MILLISECOND_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS, u64::MAX);
+pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
+pub const BLOCK_GAS_LIMIT: u64 = 75_000_000;
+pub const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
+
+/**
+* @@ Currency @@
+* Purpose:
+* Properties:
+*/
 pub mod currency {
     use super::Balance;
 
     pub const SUPPLY_FACTOR: Balance = 1;
     pub const WEI: Balance = 1;
-    pub const KILOWEI: Balance = 1_000;
-    pub const MEGAWEI: Balance = 1_000_000;
-    pub const GIGAWEI: Balance = 1_000_000_000;
-    pub const MICROLAVA: Balance = 1_000_000_000_000;
-    pub const MILLILAVA: Balance = 1_000_000_000_000_000;
+    pub const KIL_O_WEI: Balance = 1_000;
+    pub const MEGA_WEI: Balance = 1_000_000;
+    pub const GIGA_WEI: Balance = 1_000_000_000;
+    pub const MICRO_LAVA: Balance = 1_000_000_000_000;
+    pub const MILLI_LAVA: Balance = 1_000_000_000_000_000;
     pub const LAVA: Balance = 1_000_000_000_000_000_000;
-    pub const KILOLAVA: Balance = 1_000_000_000_000_000_000_000;
-    pub const TRANSACTION_BYTE_FEE: Balance = 10 * MICROLAVA * SUPPLY_FACTOR;
-    pub const STORAGE_BYTE_FEE: Balance = 100 * MICROLAVA * SUPPLY_FACTOR;
-    pub const WEIGHT_FEE: Balance = 50 * KILOWEI * SUPPLY_FACTOR;
+    pub const KILO_LAVA: Balance = 1_000_000_000_000_000_000_000;
+    pub const TRANSACTION_BYTE_FEE: Balance = 10 * MICRO_LAVA * SUPPLY_FACTOR;
+    pub const STORAGE_BYTE_FEE: Balance = 100 * MICRO_LAVA * SUPPLY_FACTOR;
+    pub const WEIGHT_FEE: Balance = 50 * KIL_O_WEI * SUPPLY_FACTOR;
     pub const fn deposit(items: u32, bytes: u32) -> Balance {
-        items as Balance * 100 * MILLILAVA * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
+        items as Balance * 100 * MILLI_LAVA * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
     }
 }
 
-pub type BlockNumber = u32;
-/// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = MultiSignature;
-/// Some way of identifying an account on the chain. We intentionally make it equivalent to the public key of our transaction signing scheme.
-pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
-/// The type for looking up accounts. We don't expect more than 4 billion of them
-pub type AccountIndex = u32;
-/// Balance of an account.
-pub type Balance = u128;
-/// Index of a transaction in the chain.
-pub type Nonce = u32;
-pub type Index = u32;
-/// A hash of some data used by the chain.
-pub type Hash = H256;
-/// The hashing algorithm used by the chain.
-pub type Hashing = BlakeTwo256;
-/// Digest item type.
-pub type DigestItem = generic::DigestItem;
-/// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
-/// the specifics of the runtime. They can then be made to be agnostic over specific formats
-/// of data like extrinsics, allowing for them to continue syncing the network through upgrades
-/// to even the core data structures.
+/**
+* @@ Runtime Version @@
+* Purpose:
+* Properties:
+*/
+#[sp_version::runtime_version]
+pub const VERSION: RuntimeVersion = RuntimeVersion {
+    spec_name: create_runtime_str!("elysium"),
+    impl_name: create_runtime_str!("elysium"),
+    authoring_version: 2,
+    spec_version: 8,
+    impl_version: 2,
+    apis: RUNTIME_API_VERSIONS,
+    transaction_version: 1,
+    state_version: 1,
+};
+
+/**
+* @@ Opaque @@
+* Purpose:
+* Properties:
+*/
 pub mod opaque {
     use super::*;
     pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
@@ -122,26 +153,11 @@ pub mod opaque {
 	}
 }
 
-#[sp_version::runtime_version]
-pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("elysium"),
-    impl_name: create_runtime_str!("elysium"),
-    authoring_version: 2,
-    spec_version: 8,
-    impl_version: 2,
-    apis: RUNTIME_API_VERSIONS,
-    transaction_version: 1,
-    state_version: 1,
-};
-
-pub const MILLISECOND_PER_BLOCK: u64 = 6000;
-pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
-// Time is measured by number of blocks.
-pub const MINUTES: BlockNumber = 60_000 / (MILLISECOND_PER_BLOCK as BlockNumber);
-pub const HOURS: BlockNumber = MINUTES * 60;
-pub const DAYS: BlockNumber = HOURS * 24;
-
-/// The version information used to identify this runtime when compiled natively.
+/**
+* @@ Native Version of Chain @@
+* Purpose:
+* Properties:
+*/
 #[cfg(feature = "std")]
 pub fn native_version() -> sp_version::NativeVersion {
     sp_version::NativeVersion {
@@ -150,15 +166,11 @@ pub fn native_version() -> sp_version::NativeVersion {
     }
 }
 
-const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-/// We allow for 2000ms of compute with a 6 second average block time.
-pub const WEIGHT_MILLISECOND_PER_BLOCK: u64 = 2000;
-pub const MAXIMUM_BLOCK_WEIGHT: Weight = Weight::from_parts(
-    WEIGHT_MILLISECOND_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS,
-    u64::MAX,
-);
-pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
-
+/**
+* @@ Pallet Frame System @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 256;
@@ -220,6 +232,11 @@ impl frame_system::Config for Runtime {
     type MaxConsumers = ConstU32<16>;
 }
 
+/**
+* @@ Pallet Aura @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub const MaxAuthorities: u32 = 100;
 }
@@ -229,6 +246,12 @@ impl pallet_aura::Config for Runtime {
     type DisabledValidators = ();
     type AllowMultipleBlocksPerSlot = ConstBool<false>;
 }
+
+/**
+* @@ Pallet Grandpa @@
+* Purpose:
+* Properties:
+*/
 impl pallet_grandpa::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = ();
@@ -239,6 +262,11 @@ impl pallet_grandpa::Config for Runtime {
     type EquivocationReportSystem = ();
 }
 
+/**
+* @@ Pallet Timestamp @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 	pub storage EnableManualSeal: bool = false;
@@ -250,6 +278,11 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = ();
 }
 
+/**
+* @@ Pallet Balance @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub const ExistentialDeposit: u128 = 0;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
@@ -273,10 +306,14 @@ impl pallet_balances::Config for Runtime {
     type MaxFreezes = ConstU32<1>;
 }
 
+/**
+* @@ Pallet Transaction Payment @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
 }
-
 impl pallet_transaction_payment::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
@@ -285,11 +322,23 @@ impl pallet_transaction_payment::Config for Runtime {
     type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
     type OperationalFeeMultiplier = ConstU8<5>;
 }
+
+/**
+* @@ Pallet Sudo @@
+* Purpose:
+* Properties:
+*/
 impl pallet_sudo::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeCall = RuntimeCall;
     type WeightInfo = pallet_sudo::weights::SubstrateWeight<Self>;
 }
+
+/**
+* @@ Pallet EVM Chain ID @@
+* Purpose:
+* Properties:
+*/
 impl pallet_evm_chain_id::Config for Runtime {}
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
@@ -305,10 +354,6 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
         None
     }
 }
-
-const BLOCK_GAS_LIMIT: u64 = 75_000_000;
-const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
-
 
 /**
 * @@ Pallet EVM @@
@@ -361,7 +406,6 @@ impl pallet_ethereum::Config for Runtime {
     type ExtraDataLength = ConstU32<30>;
 }
 
-
 /**
 * @@ Pallet Dynamic Fee @@
 * Purpose:
@@ -396,7 +440,6 @@ impl pallet_base_fee::BaseFeeThreshold for BaseFeeThreshold {
         Permill::from_parts(1_000_000)
     }
 }
-
 impl pallet_base_fee::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type Threshold = BaseFeeThreshold;
@@ -413,7 +456,6 @@ impl pallet_hotfix_sufficients::Config for Runtime {
     type AddressMapping = HashedAddressMapping<BlakeTwo256>;
     type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Self>;
 }
-
 
 /**
 * @@ Construct Runtime  @@
@@ -461,17 +503,11 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
             .expect("Encoded extrinsic is always valid")
     }
 }
-/// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
-/// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
-/// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-/// A Block signed with a Justification
 pub type SignedBlock = generic::SignedBlock<Block>;
-/// BlockId type as expected by this runtime.
 pub type BlockId = generic::BlockId<Block>;
-/// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
     frame_system::CheckNonZeroSender<Runtime>,
     frame_system::CheckSpecVersion<Runtime>,
@@ -482,15 +518,11 @@ pub type SignedExtra = (
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
-/// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =
 fp_self_contained::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
-/// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic =
 fp_self_contained::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra, H160>;
-/// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
-/// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
     Runtime,
     Block,
@@ -560,7 +592,6 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]
 extern crate frame_benchmarking;
-
 #[cfg(feature = "runtime-benchmarks")]
 mod benches {
     define_benchmarks!(
