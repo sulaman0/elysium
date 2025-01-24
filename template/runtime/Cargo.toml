@@ -12,6 +12,7 @@ repository = { workspace = true }
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
+smallvec = { workspace = true }
 scale-codec = { package = "parity-scale-codec", workspace = true }
 scale-info = { workspace = true }
 
@@ -46,6 +47,8 @@ pallet-timestamp = { workspace = true }
 pallet-transaction-payment = { workspace = true }
 pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
+pallet-node-authorization = { workspace = true }
+pallet-multisig = { workspace = true }
 # Frontier
 fp-account = { workspace = true, features = ["serde"] }
 fp-evm = { workspace = true, features = ["serde"] }
@@ -118,6 +121,8 @@ std = [
 	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-simple/std",
 	"pallet-hotfix-sufficients/std",
+	"pallet-node-authorization/std",
+	"pallet-multisig/std",
 	'pallet-session/std',
 	'substrate-validator-set/std',
 ]
