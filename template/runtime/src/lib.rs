@@ -82,7 +82,6 @@ pub mod currency {
     }
 }
 
-
 pub type BlockNumber = u32;
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = MultiSignature;
@@ -92,20 +91,15 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 pub type AccountIndex = u32;
 /// Balance of an account.
 pub type Balance = u128;
-
 /// Index of a transaction in the chain.
 pub type Nonce = u32;
 pub type Index = u32;
-
 /// A hash of some data used by the chain.
 pub type Hash = H256;
-
 /// The hashing algorithm used by the chain.
 pub type Hashing = BlakeTwo256;
-
 /// Digest item type.
 pub type DigestItem = generic::DigestItem;
-
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -140,11 +134,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     state_version: 1,
 };
 
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
-pub const SLOT_DURATION: u64 = MILLISECS_PER_BLOCK;
-
+pub const MILLISECOND_PER_BLOCK: u64 = 6000;
+pub const SLOT_DURATION: u64 = MILLISECOND_PER_BLOCK;
 // Time is measured by number of blocks.
-pub const MINUTES: BlockNumber = 60_000 / (MILLISECS_PER_BLOCK as BlockNumber);
+pub const MINUTES: BlockNumber = 60_000 / (MILLISECOND_PER_BLOCK as BlockNumber);
 pub const HOURS: BlockNumber = MINUTES * 60;
 pub const DAYS: BlockNumber = HOURS * 24;
 
@@ -159,9 +152,9 @@ pub fn native_version() -> sp_version::NativeVersion {
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2000ms of compute with a 6 second average block time.
-pub const WEIGHT_MILLISECS_PER_BLOCK: u64 = 2000;
+pub const WEIGHT_MILLISECOND_PER_BLOCK: u64 = 2000;
 pub const MAXIMUM_BLOCK_WEIGHT: Weight = Weight::from_parts(
-    WEIGHT_MILLISECS_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS,
+    WEIGHT_MILLISECOND_PER_BLOCK * WEIGHT_REF_TIME_PER_MILLIS,
     u64::MAX,
 );
 pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
@@ -175,9 +168,6 @@ parameter_types! {
 		::max_with_normal_ratio(MAXIMUM_BLOCK_LENGTH, NORMAL_DISPATCH_RATIO);
 	pub const SS58Prefix: u8 = 42;
 }
-
-// Configure FRAME pallets to include in runtime.
-
 impl frame_system::Config for Runtime {
     /// The ubiquitous event type.
     type RuntimeEvent = RuntimeEvent;
@@ -233,14 +223,12 @@ impl frame_system::Config for Runtime {
 parameter_types! {
 	pub const MaxAuthorities: u32 = 100;
 }
-
 impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
     type MaxAuthorities = MaxAuthorities;
     type DisabledValidators = ();
     type AllowMultipleBlocksPerSlot = ConstBool<false>;
 }
-
 impl pallet_grandpa::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = ();
@@ -255,17 +243,6 @@ parameter_types! {
 	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 	pub storage EnableManualSeal: bool = false;
 }
-
-// pub struct ConsensusOnTimestampSet<T>(PhantomData<T>);
-// impl<T: pallet_aura::Config> OnTimestampSet<T::Moment> for ConsensusOnTimestampSet<T> {
-//     fn on_timestamp_set(moment: T::Moment) {
-//         if EnableManualSeal::get() {
-//             return;
-//         }
-//         <pallet_aura::Pallet<T> as OnTimestampSet<T::Moment>>::on_timestamp_set(moment)
-//     }
-// }
-
 impl pallet_timestamp::Config for Runtime {
     type Moment = u64;
     type OnTimestampSet = Aura;
@@ -280,7 +257,6 @@ parameter_types! {
 	pub const MaxLocks: u32 = 50;
 	pub const MaxReserves: u32 = 50;
 }
-
 impl pallet_balances::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeHoldReason = RuntimeHoldReason;
@@ -309,13 +285,11 @@ impl pallet_transaction_payment::Config for Runtime {
     type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
     type OperationalFeeMultiplier = ConstU8<5>;
 }
-
 impl pallet_sudo::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeCall = RuntimeCall;
     type WeightInfo = pallet_sudo::weights::SubstrateWeight<Self>;
 }
-
 impl pallet_evm_chain_id::Config for Runtime {}
 
 pub struct FindAuthorTruncated<F>(PhantomData<F>);
@@ -335,14 +309,19 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
 
+
+/**
+* @@ Pallet EVM @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECS_PER_BLOCK), 0);
+	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECOND_PER_BLOCK), 0);
 	pub SuicideQuickClearLimit: u32 = 0;
 }
-
 impl pallet_evm::Config for Runtime {
     type FeeCalculator = BaseFee;
     type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
@@ -367,10 +346,14 @@ impl pallet_evm::Config for Runtime {
     type WeightInfo = pallet_evm::weights::SubstrateWeight<Self>;
 }
 
+/**
+* @@ Pallet Ethereum @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub const PostBlockAndTxnHashes: PostLogContent = PostLogContent::BlockAndTxnHashes;
 }
-
 impl pallet_ethereum::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type StateRoot = pallet_ethereum::IntermediateStateRoot<Self>;
@@ -378,14 +361,24 @@ impl pallet_ethereum::Config for Runtime {
     type ExtraDataLength = ConstU32<30>;
 }
 
+
+/**
+* @@ Pallet Dynamic Fee @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub BoundDivision: U256 = U256::from(1024);
 }
-
 impl pallet_dynamic_fee::Config for Runtime {
     type MinGasPriceBoundDivisor = BoundDivision;
 }
 
+/**
+* @@ Pallet Base Fee @@
+* Purpose:
+* Properties:
+*/
 parameter_types! {
 	pub DefaultBaseFeePerGas: U256 = U256::from(1_000_000_000);
 	pub DefaultElasticity: Permill = Permill::from_parts(125_000);
@@ -411,41 +404,22 @@ impl pallet_base_fee::Config for Runtime {
     type DefaultElasticity = DefaultElasticity;
 }
 
+/**
+* @@ Pallet HotFix Sufficient  @@
+* Purpose:
+* Properties:
+*/
 impl pallet_hotfix_sufficients::Config for Runtime {
     type AddressMapping = HashedAddressMapping<BlakeTwo256>;
     type WeightInfo = pallet_hotfix_sufficients::weights::SubstrateWeight<Self>;
 }
 
-#[frame_support::pallet]
-pub mod pallet_manual_seal {
-    use super::*;
-    use frame_support::pallet_prelude::*;
 
-    #[pallet::pallet]
-    pub struct Pallet<T>(PhantomData<T>);
-
-    #[pallet::config]
-    pub trait Config: frame_system::Config {}
-
-    #[pallet::genesis_config]
-    #[derive(frame_support::DefaultNoBound)]
-    pub struct GenesisConfig<T> {
-        pub enable: bool,
-        #[serde(skip)]
-        pub _config: PhantomData<T>,
-    }
-
-    #[pallet::genesis_build]
-    impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
-        fn build(&self) {
-            EnableManualSeal::set(&self.enable);
-        }
-    }
-}
-
-impl pallet_manual_seal::Config for Runtime {}
-
-// Create the runtime by composing the FRAME pallets that were previously configured.
+/**
+* @@ Construct Runtime  @@
+* Purpose:
+* Properties:
+*/
 frame_support::construct_runtime!(
 	pub enum Runtime {
 		System: frame_system,
@@ -461,8 +435,6 @@ frame_support::construct_runtime!(
 		DynamicFee: pallet_dynamic_fee,
 		BaseFee: pallet_base_fee,
 		HotfixSufficients: pallet_hotfix_sufficients,
-
-		ManualSeal: pallet_manual_seal,
 	}
 );
 
@@ -476,7 +448,6 @@ impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
         )
     }
 }
-
 impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConverter {
     fn convert_transaction(
         &self,
@@ -490,7 +461,6 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
             .expect("Encoded extrinsic is always valid")
     }
 }
-
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
 /// Block header type as expected by this runtime.
