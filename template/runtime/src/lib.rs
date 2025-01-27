@@ -32,25 +32,25 @@ use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::RuntimeVersion;
 #[cfg(feature = "with-rocksdb-weights")]
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
-use pallet_transaction_payment::{CurrencyAdapter, TargetedFeeAdjustment, Multiplier};
+use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, TargetedFeeAdjustment, Multiplier};
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
-    Call::transact, PostLogContent, Transaction as EthereumTransaction
+    Call::transact, PostLogContent, Transaction as EthereumTransaction, TransactionAction, TransactionData,
 };
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
-    EVMCurrencyAdapter, GasWeightMapping
+    EVMCurrencyAdapter, GasWeightMapping,
 };
 use frame_system::EnsureRoot;
 use smallvec::smallvec;
 pub use frame_support::{
     genesis_builder_helper::{build_config, create_default_config},
     parameter_types,
-    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize},
+    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize, OnTimestampSet},
     weights::{
         constants::{WEIGHT_REF_TIME_PER_MILLIS, WEIGHT_REF_TIME_PER_SECOND}, Weight, ConstantMultiplier,
-        WeightToFeePolynomial, WeightToFeeCoefficients, WeightToFeeCoefficient,
+        WeightToFeePolynomial, WeightToFeeCoefficients, WeightToFeeCoefficient, IdentityFee,
     },
 };
 pub use frame_system::Call as SystemCall;
@@ -409,7 +409,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 parameter_types! {
     pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
     pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-    pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECS_PER_BLOCK), 0);
+    pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECOND_PER_BLOCK), 0);
 	pub SuicideQuickClearLimit: u32 = 0;
     pub const ChainId: u64 = CHAIN_ID;
     pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
