@@ -2346,6 +2346,7 @@ name = "elysium"
 version = "12.0.0"
 dependencies = [
  "async-trait",
+ "bs58 0.5.0",
  "clap",
  "elysium-runtime",
  "fc-api",
@@ -2412,6 +2413,7 @@ dependencies = [
 name = "elysium-runtime"
 version = "8.0.0"
 dependencies = [
+ "bs58 0.5.0",
  "fp-account",
  "fp-evm",
  "fp-rpc",
