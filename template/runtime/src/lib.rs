@@ -36,8 +36,7 @@ use pallet_transaction_payment::{CurrencyAdapter, TargetedFeeAdjustment, Multipl
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
-    Call::transact, PostLogContent, Transaction as EthereumTransaction, TransactionAction,
-    TransactionData,
+    Call::transact, PostLogContent, Transaction as EthereumTransaction
 };
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
@@ -981,7 +980,7 @@ impl_runtime_apis! {
 				true,
 				weight_limit,
 				proof_size_base_cost,
-                <Runtime as pallet_evm::Config>::config(),
+                config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|err| err.error.into())
 		}
 
