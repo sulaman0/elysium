@@ -179,7 +179,7 @@ pub fn run() -> sc_cli::Result<()> {
 			use frame_benchmarking_cli::{
 				BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE,
 			};
-			use elysium_runtime::{ExistentialDeposit, Hashing};
+			use frontier_template_runtime::{ExistentialDeposit, Hashing};
 
 			let runner = cli.create_runner(cmd)?;
 			match cmd {
