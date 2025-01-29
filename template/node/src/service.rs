@@ -19,7 +19,7 @@ use sp_consensus_aura::sr25519::{AuthorityId as AuraId, AuthorityPair as AuraPai
 use sp_core::{H256, U256};
 use sp_runtime::traits::{Block as BlockT, NumberFor};
 // Runtime
-use frontier_template_runtime::{
+use elysium_runtime::{
 	opaque::Block, AccountId, Balance, Nonce, RuntimeApi, TransactionConverter,
 };
 
@@ -672,7 +672,7 @@ where
 			inherent_data: &mut sp_inherents::InherentData,
 		) -> Result<(), sp_inherents::Error> {
 			TIMESTAMP.with(|x| {
-				*x.borrow_mut() += frontier_template_runtime::SLOT_DURATION;
+				*x.borrow_mut() += elysium_runtime::SLOT_DURATION;
 				inherent_data.put_data(sp_timestamp::INHERENT_IDENTIFIER, &*x.borrow())
 			})
 		}
