@@ -150,8 +150,8 @@ fn testnet_genesis(
 				.map(|k| (k, UNITS))
 				.collect::<Vec<_>>()
 		},
-		"aura": { "authorities": initial_authorities.iter().map(|x| (x.1.clone())).collect::<Vec<_>>() },
-		"grandpa": { "authorities": initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect::<Vec<_>>() },
+		"aura": { "authorities": [] },
+		"grandpa": { "authorities": [] },
         "evmChainId": { "chainId": chain_id },
 		"evm": { "accounts": evm_accounts },
         "nodeAuthorization": NodeAuthorizationConfig {
