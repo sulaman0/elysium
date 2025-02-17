@@ -11,7 +11,7 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use elysium_runtime::{
     AccountId, Balance, SS58Prefix, Signature,
     WASM_BINARY, ValidatorSetConfig, SessionConfig, NodeAuthorizationConfig,
-    CHAIN_ID, currency::LAVA, opaque::SessionKeys,
+    CHAIN_ID, currency::LAVA, opaque::SessionKeys
 };
 pub type ChainSpec = sc_service::GenericChainSpec;
 fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
@@ -37,7 +37,6 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId) {
         get_from_seed::<GrandpaId>(s)
     )
 }
-
 fn properties() -> Properties {
     let mut properties = Properties::new();
     properties.insert("tokenSymbol".into(), "ELY".into());
@@ -45,8 +44,7 @@ fn properties() -> Properties {
     properties.insert("ss58Format".into(), SS58Prefix::get().into());
     properties
 }
-const UNITS: Balance = 2000 * LAVA;
-
+const UNITS: Balance = 2000000000000 * LAVA;
 pub fn development_config(enable_manual_seal: bool) -> ChainSpec {
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
         .with_name("Development")
@@ -67,7 +65,6 @@ pub fn development_config(enable_manual_seal: bool) -> ChainSpec {
         ))
         .build()
 }
-
 pub fn local_testnet_config() -> ChainSpec {
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
         .with_name("Local Testnet")
@@ -88,7 +85,6 @@ pub fn local_testnet_config() -> ChainSpec {
         ))
         .build()
 }
-
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
     sudo_key: AccountId,
@@ -140,7 +136,6 @@ fn testnet_genesis(
         );
         map
     };
-
     serde_json::json!({
 		"sudo": { "key": Some(sudo_key) },
 		"balances": {
@@ -149,6 +144,14 @@ fn testnet_genesis(
 				.cloned()
 				.map(|k| (k, UNITS))
 				.collect::<Vec<_>>()
+		},
+        "validatorSet": ValidatorSetConfig {
+			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+		},
+        "session": SessionConfig {
+			keys: initial_authorities.iter().map(|x| {
+				(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone()))
+			}).collect::<Vec<_>>(),
 		},
 		"aura": { "authorities": [] },
 		"grandpa": { "authorities": [] },
@@ -166,13 +169,6 @@ fn testnet_genesis(
 				)
 			],
 		},
-         "validatorSet": ValidatorSetConfig {
-			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-		},
-         "session": SessionConfig {
-			keys: initial_authorities.iter().map(|x| {
-				(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone()))
-			}).collect::<Vec<_>>(),
-		}
+
 	})
 }
