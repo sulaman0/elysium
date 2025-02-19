@@ -88,6 +88,27 @@ pub fn local_testnet_config() -> ChainSpec {
         ))
         .build()
 }
+pub fn prod_mainnet_config() -> ChainSpec {
+    ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
+        .with_name("Elysium Mainnet")
+        .with_id("elysium_mainnet")
+        .with_chain_type(ChainType::Live)
+        .with_properties(properties())
+        .with_genesis_config_patch(testnet_genesis(
+            get_account_id_from_seed::<sr25519::Public>("Alice"), // Sudo account Alice
+            vec![ // Pre-funded accounts
+                  get_account_id_from_seed::<sr25519::Public>("Alice"),
+                  get_account_id_from_seed::<sr25519::Public>("Bob"),
+            ],
+            vec![ // Initial PoA authorities
+                  authority_keys_from_seed("Alice"),
+                  authority_keys_from_seed("Bob"),
+            ],
+            CHAIN_ID, // Chain ID
+            false,
+        ))
+        .build()
+}
 
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
