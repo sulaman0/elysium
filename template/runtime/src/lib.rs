@@ -32,7 +32,7 @@ use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::RuntimeVersion;
 #[cfg(feature = "with-rocksdb-weights")]
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
-use pallet_transaction_payment::{CurrencyAdapter, TargetedFeeAdjustment, Multiplier};
+use pallet_transaction_payment::{CurrencyAdapter, TargetedFeeAdjustment, Multiplier, FungibleAdapter};
 use sp_genesis_builder::PresetId;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
@@ -49,7 +49,7 @@ pub use frame_support::{
     derive_impl,
     genesis_builder_helper::{build_state, get_preset},
     parameter_types,
-    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize},
+    traits::{ConstBool, ConstU32, ConstU8, FindAuthor, OnFinalize, OnTimestampSet},
     weights::{
         constants::{WEIGHT_REF_TIME_PER_MILLIS, WEIGHT_REF_TIME_PER_SECOND}, Weight, ConstantMultiplier,
         WeightToFeePolynomial, WeightToFeeCoefficients, WeightToFeeCoefficient,
@@ -269,9 +269,18 @@ parameter_types! {
 	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 	pub storage EnableManualSeal: bool = false;
 }
+pub struct ConsensusOnTimestampSet<T>(PhantomData<T>);
+impl<T: pallet_aura::Config> OnTimestampSet<T::Moment> for ConsensusOnTimestampSet<T> {
+    fn on_timestamp_set(moment: T::Moment) {
+        if EnableManualSeal::get() {
+            return;
+        }
+        <pallet_aura::Pallet<T> as OnTimestampSet<T::Moment>>::on_timestamp_set(moment)
+    }
+}
 impl pallet_timestamp::Config for Runtime {
     type Moment = u64;
-    type OnTimestampSet = Aura;
+    type OnTimestampSet = ConsensusOnTimestampSet<Self>;
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = ();
 }
@@ -593,6 +602,41 @@ impl pallet_multisig::Config for Runtime {
     type MaxSignatories = MaxSignatories;
     type WeightInfo = pallet_multisig::weights::SubstrateWeight<Runtime>;
 }
+
+// ==============================
+// @@ Pallet Manual Seal @@
+// Purpose:
+// Properties:
+// ==============================
+#[frame_support::pallet]
+pub mod pallet_manual_seal {
+    use super::*;
+    use frame_support::pallet_prelude::*;
+
+    #[pallet::pallet]
+    pub struct Pallet<T>(PhantomData<T>);
+
+    #[pallet::config]
+    pub trait Config: frame_system::Config {}
+
+    #[pallet::genesis_config]
+    #[derive(frame_support::DefaultNoBound)]
+    pub struct GenesisConfig<T> {
+        pub enable: bool,
+        #[serde(skip)]
+        pub _config: PhantomData<T>,
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config> BuildGenesisConfig for GenesisConfig<T> {
+        fn build(&self) {
+            EnableManualSeal::set(&self.enable);
+        }
+    }
+}
+
+impl pallet_manual_seal::Config for Runtime {}
+
 // ==============================
 // @@ Construct Runtime  @@
 // Purpose:
@@ -671,6 +715,9 @@ mod runtime {
 
     #[runtime::pallet_index(18)]
     pub type Multisig = pallet_multisig;
+
+    #[runtime::pallet_index(19)]
+    pub type ManualSeal = pallet_manual_seal;
 }
 
 #[derive(Clone)]

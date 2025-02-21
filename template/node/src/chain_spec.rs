@@ -116,7 +116,7 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     initial_authorities: Vec<(AccountId, AuraId, GrandpaId)>,
     chain_id: u64,
-    _enable_manual_seal: bool,
+    enable_manual_seal: bool,
 ) -> serde_json::Value {
     let evm_accounts = {
         let mut map = BTreeMap::new();
@@ -194,6 +194,8 @@ fn testnet_genesis(
 			keys: initial_authorities.iter().map(|x| {
 				(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone()))
 			}).collect::<Vec<_>>(),
-		}
+		},
+        "manualSeal": { "enable": enable_manual_seal }
+
 	})
 }
