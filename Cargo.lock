@@ -10547,7 +10547,7 @@ dependencies = [
 
 [[package]]
 name = "substrate-validator-set"
-version = "1.1.0"
+version = "1.13.0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
