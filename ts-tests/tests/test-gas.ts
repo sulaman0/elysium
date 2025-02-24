@@ -329,7 +329,7 @@ describeWithFrontier("Frontier RPC (Gas limit Weightv2 pov size)", (context) => 
 				to: contractAddress,
 				value: "0x1",
 				gasPrice: GAS_PRICE,
-				gas: "0xF4240",
+				gas: GAS,
 				nonce,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
