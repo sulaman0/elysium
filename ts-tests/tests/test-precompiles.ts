@@ -2,7 +2,7 @@ import { assert, expect } from "chai";
 import { AbiItem } from "web3-utils";
 
 import ECRecoverTests from "../build/contracts/ECRecoverTests.json";
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS, GAS_PRICE, GAS} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Precompile)", (context) => {
