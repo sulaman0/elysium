@@ -10,7 +10,7 @@ export const RUNTIME_SPEC_NAME = "elysium";
 export const RUNTIME_SPEC_VERSION = 1;
 export const RUNTIME_IMPL_VERSION = 1;
 
-export const CHAIN_ID = 42;
+export const CHAIN_ID = 1339;
 export const BLOCK_TIMESTAMP = 6; // 6 seconds per block
 export const BLOCK_HASH_COUNT = 256;
 export const EXISTENTIAL_DEPOSIT = 500; // The minimum amount required to keep an account open

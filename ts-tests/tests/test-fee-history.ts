@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID, GAS, GAS_PRICE} from "./config";
 import { createAndFinalizeBlock, describeWithFrontier, customRequest } from "./util";
 
 // We use ethers library in this test as apparently web3js's types are not fully EIP-1559 compliant yet.
@@ -39,11 +39,11 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
 					from: GENESIS_ACCOUNT,
 					data: TEST_CONTRACT_BYTECODE,
 					value: "0x00",
-					maxFeePerGas: "0x3B9ACA00",
+					maxFeePerGas: GAS_PRICE,
 					maxPriorityFeePerGas: context.web3.utils.numberToHex(priority_fees[p]),
 					accessList: [],
 					nonce: nonce,
-					gasLimit: "0x100000",
+					gasLimit: GAS,
 					chainId: CHAIN_ID,
 				});
 				nonce++;
@@ -74,7 +74,7 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
 		// baseFeePerGas is always the requested block range + 1 (the next derived base fee).
 		expect(result.baseFeePerGas.length).to.be.eq(blockCount + 1);
 		// gasUsedRatio for the requested block range.
-		expect(result.gasUsedRatio).to.be.deep.eq(Array(blockCount).fill(0.03576792));
+		expect(result.gasUsedRatio).to.be.deep.eq(Array(blockCount).fill(0.0447099));
 		// two-dimensional reward list for the requested block range.
 		expect(result.reward.length).to.be.eq(blockCount);
 		// each block has a reward list which's size is the requested percentile list.
