@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID, GAS_PRICE, MaxPriorityFeePerGas} from "./config";
 import { createAndFinalizeBlock, describeWithFrontier, customRequest } from "./util";
 
 // We use ethers library in this test as apparently web3js's types are not fully EIP-1559 compliant yet.
@@ -22,10 +22,10 @@ describeWithFrontier("Frontier RPC (Max Priority Fee Per Gas)", (context) => {
 			for (var p = 0; p < priority_fees.length; p++) {
 				await sendTransaction(context, {
 					from: GENESIS_ACCOUNT,
-					to: "0x0000000000000000000000000000000000000000",
+					to: "0x000000000000000000000000000000000000000",
 					data: "0x",
-					value: "0x00",
-					maxFeePerGas: "0x3B9ACA00",
+					value: "0x0",
+					maxFeePerGas: GAS_PRICE,
 					maxPriorityFeePerGas: context.web3.utils.numberToHex(priority_fees[p]),
 					accessList: [],
 					nonce: nonce,
@@ -40,13 +40,13 @@ describeWithFrontier("Frontier RPC (Max Priority Fee Per Gas)", (context) => {
 
 	step("should default to zero on genesis", async function () {
 		let result = await customRequest(context.web3, "eth_maxPriorityFeePerGas", []);
-		expect(result.result).to.be.eq("0x0");
+		expect(result.result).to.be.eq(MaxPriorityFeePerGas);
 	});
 
 	step("should default to zero on empty blocks", async function () {
 		await createAndFinalizeBlock(context.web3);
 		let result = await customRequest(context.web3, "eth_maxPriorityFeePerGas", []);
-		expect(result.result).to.be.eq("0x0");
+		expect(result.result).to.be.eq(MaxPriorityFeePerGas);
 	});
 
 	// - Create 20 blocks, each with 10 txns.
@@ -90,6 +90,6 @@ describeWithFrontier("Frontier RPC (Max Priority Fee Per Gas)", (context) => {
 		}
 
 		let result = (await customRequest(context.web3, "eth_maxPriorityFeePerGas", [])).result;
-		expect(result).to.be.eq("0x0");
+		expect(result).to.be.eq(MaxPriorityFeePerGas);
 	});
 });
