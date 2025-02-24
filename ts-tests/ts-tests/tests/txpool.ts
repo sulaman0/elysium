@@ -18,7 +18,7 @@ describeWithFrontier("Frontier RPC (TxPoolApi)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: nonce,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY

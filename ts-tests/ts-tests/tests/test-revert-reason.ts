@@ -20,7 +20,7 @@ describeWithFrontier("Frontier RPC (Revert Reason)", (context) => {
 				data: REVERT_W_MESSAGE_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

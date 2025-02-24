@@ -19,7 +19,7 @@ describeWithFrontier("Frontier RPC (Contract)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -96,16 +96,16 @@ describeWithFrontier("Frontier RPC (Contract)", (context) => {
 
 		let tx1 = contract.methods
 			.setStorage("0x2A", "0x1")
-			.send({ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ });
+			.send({ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ });
 
 		let tx2 = contract.methods
 			.setStorage("0x2A", "0x1")
-			.send({ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ });
+			.send({ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ });
 
 		let tx3 = contract.methods
 			.setStorage("0x2A", "0x2")
 			.send(
-				{ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ },
+				{ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ },
 				async (hash) => await createAndFinalizeBlock(context.web3)
 			);
 

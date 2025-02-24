@@ -29,7 +29,7 @@ describeWithFrontier("Frontier RPC (estimate gas historically)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -197,7 +197,7 @@ describeWithFrontier("Frontier RPC (RPC execution)", (context) => {
 				data: FORCE_GAS_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

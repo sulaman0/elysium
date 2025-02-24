@@ -15,7 +15,7 @@ describeWithFrontier("Frontier RPC (Priority)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: gasPrice,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: 0,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY

@@ -15,7 +15,7 @@ describeWithFrontier("Frontier RPC (Nonce)", (context) => {
 				to: TEST_ACCOUNT,
 				value: "0x200", // Must be higher than ExistentialDeposit
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -44,7 +44,7 @@ describeWithFrontier("Frontier RPC (Nonce)", (context) => {
 				to: TEST_ACCOUNT,
 				value: "0x400", // Must be higher than ExistentialDeposit
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: 0,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
