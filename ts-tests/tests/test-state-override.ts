@@ -45,7 +45,7 @@ describeWithFrontier("Frontier RPC (StateOverride)", (context) => {
 				to: contractAddress,
 				data: contract.methods.setAllowance(otherAddress, 10).encodeABI(),
 				gas: "0x100000",
-				gasPrice: "0x3B9ACA00",
+				gasPrice: GAS_PRICE,
 				value: "0x0",
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY

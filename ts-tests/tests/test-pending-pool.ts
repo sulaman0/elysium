@@ -15,7 +15,7 @@ describeWithFrontier("Frontier RPC (Pending Pool)", (context) => {
 				from: GENESIS_ACCOUNT,
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
+				gasPrice: GAS_PRICE,
 				gas: "0x100000",
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
@@ -61,7 +61,7 @@ describeWithFrontier("Frontier RPC (Pending Transaction Count)", (context) => {
 					from: GENESIS_ACCOUNT,
 					to: TEST_ACCOUNT,
 					value: "0x200", // Must be higher than ExistentialDeposit
-					gasPrice: "0x3B9ACA00",
+					gasPrice: GAS_PRICE,
 					gas: "0x100000",
 					nonce: nonce,
 				},
