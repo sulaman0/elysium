@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GAS_PRICE_DECIMAL, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { describeWithFrontier, customRequest } from "./util";
 
 describeWithFrontier("Frontier RPC (TxPoolApi)", (context) => {
@@ -50,10 +50,10 @@ describeWithFrontier("Frontier RPC (TxPoolApi)", (context) => {
 	step("txpool_inspect should return correct result", async function () {
 		let txpoolInspect = await customRequest(context.web3, "txpool_inspect", []);
 		expect(txpoolInspect.result.pending[GENESIS_ACCOUNT]["0x0"]).to.be.equal(
-			"0x0000000000000000000000000000000000000000: 0 wei + 1048576 gas x 1000000000 wei"
+			`0x0000000000000000000000000000000000000000: 0 wei + 1048576 gas x ${GAS_PRICE_DECIMAL} wei`
 		);
 		expect(txpoolInspect.result.queued[GENESIS_ACCOUNT]["0x3"]).to.be.equal(
-			"0x0000000000000000000000000000000000000000: 0 wei + 1048576 gas x 1000000000 wei"
+			`0x0000000000000000000000000000000000000000: 0 wei + 1048576 gas x ${GAS_PRICE_DECIMAL} wei`
 		);
 	});
 });

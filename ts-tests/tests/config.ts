@@ -18,6 +18,7 @@ export const EXISTENTIAL_DEPOSIT = 500; // The minimum amount required to keep a
 export const ETH_BLOCK_GAS_LIMIT = 60000000; // The same configuration as runtime
 export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as runtime
 export const GAS_PRICE = "0x4A817C80"; // 1250000000
+export const GAS_PRICE_DECIMAL = "1250000000"; // 1250000000
 export const GAS = "0x100000";
 export const TRANFER_VALUE = "0x200"; // 512
 export const MaxPriorityFeePerGas = "0x5"; // 512
