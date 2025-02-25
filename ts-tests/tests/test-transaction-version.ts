@@ -76,7 +76,7 @@ describeWithFrontier("Frontier RPC (Transaction Version)", (context) => {
 			from: GENESIS_ACCOUNT,
 			data: TEST_CONTRACT_BYTECODE,
 			value: "0x00",
-			maxFeePerGas: "0x3B9ACA00",
+			maxFeePerGas: GAS_PRICE,
 			maxPriorityFeePerGas: "0x01",
 			type: 2,
 			accessList: [],
