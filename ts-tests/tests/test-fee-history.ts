@@ -1,8 +1,8 @@
-import {ethers} from "ethers";
+import {ethers, toNumber} from "ethers";
 import {expect} from "chai";
 import {step} from "mocha-steps";
 
-import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID, GAS, GAS_PRICE} from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID, GAS, GAS_PRICE, GAS_PRICE_DECIMAL} from "./config";
 import {createAndFinalizeBlock, describeWithFrontier, customRequest} from "./util";
 
 // We use ethers library in this test as apparently web3js's types are not fully EIP-1559 compliant yet.
@@ -35,12 +35,12 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
     async function createBlocks(block_count, priority_fees) {
         for (var b = 0; b < block_count; b++) {
             for (var p = 0; p < priority_fees.length; p++) {
-                await sendTransaction(context, {
+                let tx = await sendTransaction(context, {
                     from: GENESIS_ACCOUNT,
                     data: TEST_CONTRACT_BYTECODE,
                     value: "0x00",
-                    maxFeePerGas: GAS_PRICE,
-                    maxPriorityFeePerGas: context.web3.utils.numberToHex(priority_fees[p]),
+                    maxFeePerGas: context.web3.utils.toHex(toNumber(GAS_PRICE_DECIMAL) * 2),
+                    maxPriorityFeePerGas: context.web3.utils.toHex(priority_fees[p]),
                     accessList: [],
                     nonce: nonce,
                     gasLimit: GAS,
@@ -89,8 +89,10 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
         let rewardPercentiles = [20, 50, 70, 85, 100];
         let priorityFees = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         await createBlocks(blockCount, priorityFees);
-        let result = (await customRequest(context.web3, "eth_feeHistory", ["0xA", "latest", rewardPercentiles])).result;
-        console.log(result);
+
+        let latestBlockNumber = await context.web3.eth.getBlockNumber();
+
+        let result = (await customRequest(context.web3, "eth_feeHistory", ["0xA", latestBlockNumber.toString(), rewardPercentiles])).result;
 
         // Calculate the percentiles in javascript.
         let localRewards = [];
@@ -101,8 +103,6 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
         for (let i = 0; i < result.reward.length; i++) {
             expect(result.reward[i].length).to.be.eq(localRewards.length);
             for (let j = 0; j < localRewards.length; j++) {
-                console.log(result.reward[i][j], "result.reward[i][j]")
-                console.log(context.web3.utils.hexToNumber(result.reward[i][j]), localRewards[j])
                 expect(context.web3.utils.hexToNumber(result.reward[i][j])).to.be.eq(localRewards[j]);
             }
         }
