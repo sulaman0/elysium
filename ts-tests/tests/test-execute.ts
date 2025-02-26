@@ -1,6 +1,6 @@
 import { assert, expect } from "chai";
 import { step } from "mocha-steps";
-import { ETH_BLOCK_GAS_LIMIT, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {ETH_BLOCK_GAS_LIMIT, GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 
 import { describeWithFrontier, customRequest, createAndFinalizeBlock } from "./util";
 import { AbiItem } from "web3-utils";
@@ -29,7 +29,7 @@ describeWithFrontier("Frontier RPC (estimate gas historically)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -70,7 +70,7 @@ describeWithFrontier("Frontier RPC (estimate gas historically)", (context) => {
 				data: SSTORE_SET_DATA,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x500000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -197,7 +197,7 @@ describeWithFrontier("Frontier RPC (RPC execution)", (context) => {
 				data: FORCE_GAS_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

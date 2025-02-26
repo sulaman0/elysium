@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { step } from "mocha-steps";
 import { TransactionReceipt } from "web3-core";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { createAndFinalizeBlock, describeWithFrontier, customRequest } from "./util";
 
 describeWithFrontier("Frontier RPC (Log filtering)", (context) => {
@@ -16,7 +16,7 @@ describeWithFrontier("Frontier RPC (Log filtering)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

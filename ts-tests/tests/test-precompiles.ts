@@ -2,7 +2,7 @@ import { assert, expect } from "chai";
 import { AbiItem } from "web3-utils";
 
 import ECRecoverTests from "../build/contracts/ECRecoverTests.json";
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS, GAS_PRICE, GAS} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Precompile)", (context) => {
@@ -19,7 +19,7 @@ describeWithFrontier("Frontier RPC (Precompile)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -52,7 +52,7 @@ describeWithFrontier("Frontier RPC (Precompile)", (context) => {
 				data: `0x${hash.toString()}${sigPart}`,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

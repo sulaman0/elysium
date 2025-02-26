@@ -25,7 +25,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
 				to: TEST_ACCOUNT,
 				value: TRANFER_VALUE,
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: nonce,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
@@ -58,7 +58,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
 				to: TEST_ACCOUNT,
 				value: TRANFER_VALUE,
 				gasPrice: Number(gas_price) - 1,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: nonce,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
@@ -76,7 +76,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
 				to: GENESIS_ACCOUNT,
 				value: test_account_balance + 1,
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 				nonce: nonce,
 			},
 			TEST_ACCOUNT_PRIVATE_KEY

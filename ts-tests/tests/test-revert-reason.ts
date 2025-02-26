@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { AbiItem } from "web3-utils";
 
 import ExplicitRevertReason from "../build/contracts/ExplicitRevertReason.json";
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Revert Reason)", (context) => {
@@ -20,7 +20,7 @@ describeWithFrontier("Frontier RPC (Revert Reason)", (context) => {
 				data: REVERT_W_MESSAGE_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

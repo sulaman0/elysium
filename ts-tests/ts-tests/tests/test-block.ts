@@ -158,7 +158,7 @@ describeWithFrontier("Frontier RPC (Pending Block)", (context) => {
 					to: TEST_ACCOUNT,
 					value: "0x200", // Must be higher than ExistentialDeposit
 					gasPrice: GAS_PRICE,
-					gas: "0x100000",
+					gas: GAS,
 					nonce: nonce,
 				},
 				GENESIS_ACCOUNT_PRIVATE_KEY
@@ -219,7 +219,7 @@ describeWithFrontier("Frontier RPC (BlockReceipts)", (context) => {
 					to: TEST_ACCOUNT,
 					value: "0x200", // Must be higher than ExistentialDeposit
 					gasPrice: GAS_PRICE,
-					gas: "0x100000",
+					gas: GAS,
 					nonce: nonce,
 				},
 				GENESIS_ACCOUNT_PRIVATE_KEY

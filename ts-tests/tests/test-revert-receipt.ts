@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Constructor Revert)", (context) => {
@@ -27,7 +27,7 @@ describeWithFrontier("Frontier RPC (Constructor Revert)", (context) => {
 				data: GOOD_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -56,7 +56,7 @@ describeWithFrontier("Frontier RPC (Constructor Revert)", (context) => {
 				data: FAIL_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

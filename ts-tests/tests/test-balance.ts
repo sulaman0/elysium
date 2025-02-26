@@ -1,15 +1,19 @@
 import {expect} from "chai";
 import {step} from "mocha-steps";
 
-import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, GENESIS_ACCOUNT_BALANCE, EXISTENTIAL_DEPOSIT} from "./config";
+import {
+    GENESIS_ACCOUNT,
+    GENESIS_ACCOUNT_PRIVATE_KEY,
+    GENESIS_ACCOUNT_BALANCE,
+    EXISTENTIAL_DEPOSIT,
+    GAS_PRICE, TRANFER_VALUE, GAS
+} from "./config";
 import {createAndFinalizeBlock, describeWithFrontier, customRequest} from "./util";
 import {getIndexedAccountPath} from "ethers";
 
 describeWithFrontier("Frontier RPC (Balance)", (context) => {
     const TEST_ACCOUNT = "0xdd33Af49c851553841E94066B54Fd28612522901";
     const TEST_ACCOUNT_PRIVATE_KEY = "0x4ca933bffe83185dda76e7913fc96e5c97cdb7ca1fbfcc085d6376e6f564ef71";
-    const TRANFER_VALUE = "0x200"; // 512, must be higher than ExistentialDeposit
-    const GAS_PRICE = "0x4A817C80"; // 1250000000
     var nonce = 0;
 
     step("genesis balance is setup correctly", async function () {
@@ -26,7 +30,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
                 to: TEST_ACCOUNT,
                 value: TRANFER_VALUE,
                 gasPrice: GAS_PRICE,
-                gas: "0x100000",
+                gas: GAS,
                 nonce: nonce,
             },
             GENESIS_ACCOUNT_PRIVATE_KEY
@@ -72,7 +76,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
                 to: TEST_ACCOUNT,
                 value: TRANFER_VALUE,
                 gasPrice: Number(gas_price) - 1,
-                gas: "0x100000",
+                gas: GAS,
                 nonce: nonce,
             },
             GENESIS_ACCOUNT_PRIVATE_KEY
@@ -90,7 +94,7 @@ describeWithFrontier("Frontier RPC (Balance)", (context) => {
                 to: GENESIS_ACCOUNT,
                 value: test_account_balance + 1,
                 gasPrice: GAS_PRICE,
-                gas: "0x100000",
+                gas: GAS,
                 nonce: nonce,
             },
             TEST_ACCOUNT_PRIVATE_KEY

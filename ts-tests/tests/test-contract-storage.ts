@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { AbiItem } from "web3-utils";
 
 import Test from "../build/contracts/Storage.json";
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS, GAS_PRICE} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Contract)", (context) => {
@@ -18,8 +18,8 @@ describeWithFrontier("Frontier RPC (Contract)", (context) => {
 				from: GENESIS_ACCOUNT,
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -52,7 +52,7 @@ describeWithFrontier("Frontier RPC (Contract)", (context) => {
 					)
 					.encodeABI(),
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
+				gasPrice: GAS_PRICE,
 				gas: "0x500000",
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
@@ -89,23 +89,23 @@ describeWithFrontier("Frontier RPC (Contract)", (context) => {
 		await context.web3.eth.accounts.wallet.add(GENESIS_ACCOUNT_PRIVATE_KEY);
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 
 		const promisify = (inner) => new Promise((resolve, reject) => inner(resolve, reject));
 
 		let tx1 = contract.methods
 			.setStorage("0x2A", "0x1")
-			.send({ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ });
+			.send({ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ });
 
 		let tx2 = contract.methods
 			.setStorage("0x2A", "0x1")
-			.send({ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ });
+			.send({ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ });
 
 		let tx3 = contract.methods
 			.setStorage("0x2A", "0x2")
 			.send(
-				{ from: GENESIS_ACCOUNT, gas: "0x100000", nonce: nonce++ },
+				{ from: GENESIS_ACCOUNT, gas: GAS, nonce: nonce++ },
 				async (hash) => await createAndFinalizeBlock(context.web3)
 			);
 

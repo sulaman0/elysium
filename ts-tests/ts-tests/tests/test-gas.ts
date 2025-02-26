@@ -202,7 +202,7 @@ describeWithFrontier("Frontier RPC (Gas limit Weightv2 ref time)", (context) => 
 				data: STORAGE_LOOP_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -228,7 +228,7 @@ describeWithFrontier("Frontier RPC (Gas limit Weightv2 ref time)", (context) => 
 					to: contract.options.address,
 					data: data.encodeABI(),
 					gasPrice: GAS_PRICE,
-					gas: "0x100000",
+					gas: GAS,
 					nonce,
 				},
 				GENESIS_ACCOUNT_PRIVATE_KEY
@@ -290,7 +290,7 @@ describeWithFrontier("Frontier RPC (Gas limit Weightv2 pov size)", (context) => 
 				data: STORAGE_LOOP_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -346,7 +346,7 @@ describeWithFrontier("Frontier RPC (Gas limit Weightv2 pov size)", (context) => 
 					to: contract.options.address,
 					data: data.encodeABI(),
 					gasPrice: GAS_PRICE,
-					gas: "0x100000",
+					gas: GAS,
 					nonce,
 				},
 				GENESIS_ACCOUNT_PRIVATE_KEY
@@ -394,7 +394,7 @@ describeWithFrontier("Frontier RPC (Invalid opcode estimate gas)", (context) => 
 				data: INVALID_OPCODE_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);

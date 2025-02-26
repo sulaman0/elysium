@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontierWs } from "./util";
 
 describeWithFrontierWs("Frontier RPC (Subscription)", (context) => {
@@ -18,7 +18,7 @@ describeWithFrontierWs("Frontier RPC (Subscription)", (context) => {
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
 				gasPrice: GAS_PRICE,
-				gas: "0x1000000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
