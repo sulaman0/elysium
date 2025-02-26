@@ -1,4 +1,4 @@
-// FAILING TEST:::: TEST-GAS, test-max-priority fee per gas, state override, transaction priority error
+// FAILING TEST:::: test-max-priority fee per gas, state override, transaction priority error
 export const GENESIS_ACCOUNT = "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b";
 export const GENESIS_ACCOUNT_PRIVATE_KEY = "0x99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342";
 export const GENESIS_ACCOUNT_BALANCE = "340282366920938463463374607431768210955";
@@ -19,7 +19,8 @@ export const ETH_BLOCK_GAS_LIMIT = 60000000; // The same configuration as runtim
 export const ETH_BLOCK_POV_LIMIT = 5 * 1024 * 1024; // The same configuration as runtime
 export const GAS_PRICE = "0x4A817C80"; // 1250000000
 export const GAS_PRICE_DECIMAL = "1250000000"; // 1250000000
-export const GAS = "0x100000";
+export const GAS = "0x100000"; // 1048576
+export const GAS_DECIMAL = "1048576"; // 1048576
 export const TRANFER_VALUE = "0x200"; // 512
 export const MaxPriorityFeePerGas = "0x5"; // 512
 
