@@ -98,6 +98,11 @@ cargo test
 
 # Run the tests one by one
 cargo test -- --test-threads=1
+
+### Running testcases for EVM support are
+cd ts-test 
+npm run build
+npm run test
 ```
 ## Chain ID
 
