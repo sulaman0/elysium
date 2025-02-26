@@ -139,7 +139,7 @@ export async function startFrontierNode(provider?: string): Promise<{
     let ethersjs = new ethers.JsonRpcProvider(`http://127.0.0.1:${RPC_PORT}`, {
         chainId: CHAIN_ID,
         name: "elysium",
-        ensAddress: null,
+        ensAddress: null,  // Prevents ENS resolution
     });
 
     return {web3, binary, ethersjs};
