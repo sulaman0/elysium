@@ -66,6 +66,7 @@ pallet-evm-precompile-simple = { workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
 pallet-session = { workspace = true }
 pallet-authorship = { workspace = true }
+log = "0.4.25"
 
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
