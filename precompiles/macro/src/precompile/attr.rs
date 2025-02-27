@@ -16,7 +16,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::spanned::Spanned;
