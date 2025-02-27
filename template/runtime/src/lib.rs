@@ -32,7 +32,7 @@ use sp_std::{marker::PhantomData, prelude::*};
 use sp_version::RuntimeVersion;
 #[cfg(feature = "with-rocksdb-weights")]
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
-use pallet_transaction_payment::{CurrencyAdapter, TargetedFeeAdjustment, Multiplier, FungibleAdapter};
+use pallet_transaction_payment::{TargetedFeeAdjustment, Multiplier, FungibleAdapter};
 use sp_genesis_builder::PresetId;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
@@ -54,6 +54,7 @@ pub use frame_support::{
         constants::{WEIGHT_REF_TIME_PER_MILLIS, WEIGHT_REF_TIME_PER_SECOND}, Weight, ConstantMultiplier,
         WeightToFeePolynomial, WeightToFeeCoefficients, WeightToFeeCoefficient,
     },
+    dispatch::{DispatchClass, GetDispatchInfo, PostDispatchInfo},
 };
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
@@ -181,13 +182,36 @@ pub fn native_version() -> sp_version::NativeVersion {
 // Purpose
 // Properties
 // ==============================
+// Here we assume Ethereum's base fee of 21000 gas and convert to weight, but we
+// subtract roughly the cost of a balance transfer from it (about 1/3 the cost)
+// and some cost to account for per-byte-fee.
+// TODO: we should use benchmarking's overhead feature to measure this
+pub const EXTRINSIC_BASE_WEIGHT: Weight = Weight::from_parts(10000 * WEIGHT_PER_GAS, 0);
+pub const NORMAL_WEIGHT: Weight = MAXIMUM_BLOCK_WEIGHT.saturating_mul(3).saturating_div(4);
+pub struct RuntimeBlockWeights;
+impl Get<frame_system::limits::BlockWeights> for RuntimeBlockWeights {
+    fn get() -> frame_system::limits::BlockWeights {
+        frame_system::limits::BlockWeights::builder()
+            .for_class(DispatchClass::Normal, |weights| {
+                weights.base_extrinsic = EXTRINSIC_BASE_WEIGHT;
+                weights.max_total = NORMAL_WEIGHT.into();
+            })
+            .for_class(DispatchClass::Operational, |weights| {
+                weights.max_total = MAXIMUM_BLOCK_WEIGHT.into();
+                weights.reserved = (MAXIMUM_BLOCK_WEIGHT - NORMAL_WEIGHT).into();
+            })
+            .avg_block_initialization(Perbill::from_percent(10))
+            .build()
+            .expect("Provided BlockWeight definitions are valid, qed")
+    }
+}
 parameter_types! {
 	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 256;
 	pub BlockWeights: frame_system::limits::BlockWeights = frame_system::limits::BlockWeights
 		::with_sensible_defaults(MAXIMUM_BLOCK_WEIGHT, NORMAL_DISPATCH_RATIO);
 	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
-		::max_with_normal_ratio(MAXIMUM_BLOCK_LENGTH, NORMAL_DISPATCH_RATIO);
+		::max_with_normal_ratio(MAXIMUM_BLOCK_LENGTH, NORMAL_DISPATCH_RATIO); // allow 5 MB block
 	pub const SS58Prefix: u8 = 42;
 }
 
@@ -195,7 +219,7 @@ parameter_types! {
 impl frame_system::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type BaseCallFilter = frame_support::traits::Everything;
-    type BlockWeights = BlockWeights;
+    type BlockWeights = RuntimeBlockWeights;
     type BlockLength = BlockLength;
     type RuntimeOrigin = RuntimeOrigin;
     type RuntimeCall = RuntimeCall;
@@ -217,6 +241,11 @@ impl frame_system::Config for Runtime {
     type SS58Prefix = SS58Prefix;
     type OnSetCode = ();
     type MaxConsumers = ConstU32<16>;
+    type SingleBlockMigrations = ();
+    type MultiBlockMigrator = ();
+    type PreInherents = ();
+    type PostInherents = ();
+    type PostTransactions = ();
 }
 
 // ==============================
@@ -301,7 +330,7 @@ impl pallet_balances::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type RuntimeHoldReason = RuntimeHoldReason;
     type RuntimeFreezeReason = RuntimeFreezeReason;
-    type WeightInfo = ();
+    type WeightInfo = pallet_balances::weights::SubstrateWeight<Self>;
     type Balance = Balance;
     type DustRemoval = ();
     type ExistentialDeposit = ExistentialDeposit;
@@ -364,9 +393,10 @@ pub type SlowAdjustingFeeUpdate<R> = TargetedFeeAdjustment<
     MinimumMultiplier,
     MaximumMultiplier,
 >;
+
 impl pallet_transaction_payment::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
-    type OnChargeTransaction = CurrencyAdapter<Balances, crate::impls::DealWithFees>;
+    type OnChargeTransaction = FungibleAdapter<Balances, crate::impls::DealWithFees<Runtime>>;
     type WeightToFee = ConstantMultiplier<Balance, ConstU128<{ currency::WEIGHT_FEE }>>;
     type LengthToFee = LengthToFee;
     type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Runtime>;
