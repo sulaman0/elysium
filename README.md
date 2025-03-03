@@ -158,4 +158,4 @@ When modifying the git repository for these dependencies, a tool called [diener]
 
 ## Changelog
 
-You can find the changelog [here](./CHANGELOG.md).
+You can find the changelog [here](./CHANGELOG.md)
