@@ -45,7 +45,7 @@ fn properties() -> Properties {
     properties.insert("ss58Format".into(), SS58Prefix::get().into());
     properties
 }
-const UNITS: Balance = 2000000000000000000 * LAVA;
+const UNITS: Balance = 200 * LAVA;
 
 pub fn development_config(enable_manual_seal: bool) -> ChainSpec {
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())

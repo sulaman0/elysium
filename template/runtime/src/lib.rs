@@ -2,6 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
+#![cfg_attr(not(feature = "std"), no_std)]
 #![recursion_limit = "256"]
 #![allow(clippy::new_without_default, clippy::or_fun_call)]
 #![cfg_attr(feature = "runtime-benchmarks", warn(unused_crate_dependencies))]
@@ -100,7 +101,7 @@ pub const MAXIMUM_BLOCK_WEIGHT: Weight = Weight::from_parts(WEIGHT_MILLISECOND_P
 pub const MAXIMUM_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
 pub const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 pub const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
-pub const CHAIN_ID: u64 = 1339;
+pub const CHAIN_ID: u64 = 1569;
 pub const GAS_PER_SECOND: u64 = 40_000_000;
 const WEIGHT_PER_GAS: u64 = WEIGHT_REF_TIME_PER_SECOND / GAS_PER_SECOND;
 // ==============================
@@ -372,7 +373,7 @@ parameter_types! {
     pub const TransactionByteFee: Balance = currency::TRANSACTION_BYTE_FEE;
     /// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
     /// than this will decrease the weight and more will increase.
-    pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
+    pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(35);
     /// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
     /// change the fees more rapidly. This low value causes changes to occur slowly over time.
     pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(4, 1_000);
@@ -440,10 +441,11 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 // Purpose:
 // Properties:
 // ==============================
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
+pub struct TransactionPaymentAsGasPrice;
+impl FeeCalculator for TransactionPaymentAsGasPrice {
     fn min_gas_price() -> (U256, Weight) {
-        let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
+        // let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
+        let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
         (
             min_gas_price.into(),
             <Runtime as frame_system::Config>::DbWeight::get().reads(1),
@@ -453,13 +455,15 @@ impl FeeCalculator for FixedGasPrice {
 parameter_types! {
     pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-	pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECOND_PER_BLOCK), 0);
+	// pub WeightPerGas: Weight = Weight::from_parts(weight_per_gas(BLOCK_GAS_LIMIT, NORMAL_DISPATCH_RATIO, WEIGHT_MILLISECOND_PER_BLOCK), 0);
+    pub WeightPerGas: Weight = Weight::from_parts(WEIGHT_PER_GAS, 0);
 	pub SuicideQuickClearLimit: u32 = 0;
     pub const ChainId: u64 = CHAIN_ID;
     pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 }
+
 impl pallet_evm::Config for Runtime {
-    type FeeCalculator = FixedGasPrice;
+    type FeeCalculator = TransactionPaymentAsGasPrice;
     type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
     type WeightPerGas = WeightPerGas;
     type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;

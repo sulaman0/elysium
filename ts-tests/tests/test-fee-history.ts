@@ -35,7 +35,7 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
     async function createBlocks(block_count, priority_fees) {
         for (var b = 0; b < block_count; b++) {
             for (var p = 0; p < priority_fees.length; p++) {
-                let tx = await sendTransaction(context, {
+                let object = {
                     from: GENESIS_ACCOUNT,
                     data: TEST_CONTRACT_BYTECODE,
                     value: "0x00",
@@ -45,7 +45,12 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
                     nonce: nonce,
                     gasLimit: GAS,
                     chainId: CHAIN_ID,
-                });
+                };
+
+                console.log(object, "==== object value is give ===");
+                let tx = await sendTransaction(context, object);
+
+
                 nonce++;
             }
             await createAndFinalizeBlock(context.web3);
@@ -93,6 +98,8 @@ describeWithFrontier("Frontier RPC (Fee History)", (context) => {
         let latestBlockNumber = await context.web3.eth.getBlockNumber();
 
         let result = (await customRequest(context.web3, "eth_feeHistory", ["0xA", latestBlockNumber.toString(), rewardPercentiles])).result;
+
+        console.log(result, "=== result === ");
 
         // Calculate the percentiles in javascript.
         let localRewards = [];
