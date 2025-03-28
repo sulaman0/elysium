@@ -38,11 +38,11 @@ use sp_genesis_builder::PresetId;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
-    Call::transact, PostLogContent, Transaction as EthereumTransaction
+    Call::transact, PostLogContent, Transaction as EthereumTransaction,
 };
 use pallet_evm::{
     Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
-    EVMCurrencyAdapter, GasWeightMapping
+    EVMCurrencyAdapter, GasWeightMapping,
 };
 use frame_system::EnsureRoot;
 use smallvec::smallvec;
@@ -139,7 +139,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("elysium"),
     impl_name: create_runtime_str!("elysium"),
     authoring_version: 1,
-    spec_version: 9,
+    spec_version: 10,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -395,9 +395,24 @@ pub type SlowAdjustingFeeUpdate<R> = TargetedFeeAdjustment<
     MaximumMultiplier,
 >;
 
+// pub struct NoFees;
+//
+// impl pallet_transaction_payment::ChargeTransactionPayment<Runtime> for NoFees {
+//     type LiquidityInfo = ();
+//     fn withdraw_fee(_: &<Runtime as frame_system::Config>::AccountId, _: &pallet_transaction_payment::ChargeTransactionPaymentCall) -> Result<Self::LiquidityInfo, TransactionValidityError> {
+//         Ok(())
+//     }
+//
+//     fn correct_and_deposit_fee(_: &<Runtime as frame_system::Config>::AccountId, _: pallet_transaction_payment::ChargeTransactionPaymentCall, _: Self::LiquidityInfo) -> Result<(), TransactionValidityError> {
+//         Ok(())
+//     }
+// }
+
+
 impl pallet_transaction_payment::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type OnChargeTransaction = FungibleAdapter<Balances, crate::impls::DealWithFees<Runtime>>;
+    // type OnChargeTransaction =  pallet_transaction_payment::NoCharge<Runtime>;
     type WeightToFee = ConstantMultiplier<Balance, ConstU128<{ currency::WEIGHT_FEE }>>;
     type LengthToFee = LengthToFee;
     type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Runtime>;
@@ -445,10 +460,15 @@ pub struct TransactionPaymentAsGasPrice;
 impl FeeCalculator for TransactionPaymentAsGasPrice {
     fn min_gas_price() -> (U256, Weight) {
         // let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
-        let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
+        // let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
+        // (
+        //     min_gas_price.into(),
+        //     <Runtime as frame_system::Config>::DbWeight::get().reads(1),
+        // )
+
         (
-            min_gas_price.into(),
-            <Runtime as frame_system::Config>::DbWeight::get().reads(1),
+            U256::zero(), // No gas price = free EVM tx
+            Weight::zero(), // No weight
         )
     }
 }
