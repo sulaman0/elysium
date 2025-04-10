@@ -344,6 +344,21 @@ impl pallet_balances::Config for Runtime {
 }
 
 // ==============================
+// @@ Pallet Assets @@
+// Purpose:
+// Properties:
+// ==============================
+impl pallet_assets::Config for Runtime {
+    type Event = RuntimeEvent;
+    type Balance = Balance;
+    type AssetId = u32; // Adjust as needed for your asset IDs
+    type AssetDeposit = ();
+    type MetadataDeposit = ();
+    type StringLimit = ();
+    type WeightInfo = pallet_assets::weights::WeightInfo;
+}
+
+// ==============================
 // @@ Pallet Transaction Payment @@
 // Purpose:
 // Properties:
