@@ -820,8 +820,10 @@ impl<T: Config> Pallet<T> {
 					input,
 					value,
 					gas_limit.unique_saturated_into(),
-					max_fee_per_gas,
-					max_priority_fee_per_gas,
+					Option::from(U256::zero()),
+					Option::from(U256::zero()),
+					// max_fee_per_gas,
+					// max_priority_fee_per_gas,
 					nonce,
 					access_list,
 					is_transactional,
@@ -842,10 +844,10 @@ impl<T: Config> Pallet<T> {
 					}
 				};
 
-				// log::info!(
-                //     "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
-                //     from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
-                // );
+				log::info!(
+                    "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                    from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
+                );
 
 				Ok((Some(target), None, CallOrCreateInfo::Call(res)))
 			}
@@ -855,8 +857,10 @@ impl<T: Config> Pallet<T> {
 					input,
 					value,
 					gas_limit.unique_saturated_into(),
-					max_fee_per_gas,
-					max_priority_fee_per_gas,
+					Option::from(U256::zero()),
+					Option::from(U256::zero()),
+					// max_fee_per_gas,
+					// max_priority_fee_per_gas,
 					nonce,
 					access_list,
 					is_transactional,
