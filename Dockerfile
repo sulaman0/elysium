@@ -17,11 +17,18 @@ RUN apt install --assume-yes git clang curl libssl-dev llvm libudev-dev make pro
 
 RUN set -e
 
+COPY rust-toolchain.toml /elysium/rust-toolchain.toml
+
 RUN echo "*** Installing Rust environment ***"
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
-RUN rustup default stable
+#RUN rustup default stable
+#RUN rustup install 1.82.0 && rustup default 1.82.0
 # rustup version are pinned in the rust-toolchain file
+
+# Print Rust and Cargo version
+#RUN echo "==== RUST AND CARGO VERSION ====" && rustc --version && cargo --version
+#RUN /root/.cargo/bin/rustc --version && /root/.cargo/bin/cargo --version
 
 COPY . .
 

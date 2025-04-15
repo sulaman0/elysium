@@ -233,14 +233,11 @@ pub struct GenesisAccount {
 /// Trait that outputs the current transaction gas price.
 pub trait FeeCalculator {
 	/// Return the minimal required gas price.
-	fn min_gas_price(_source_address: Option<&H160>) -> (U256, Weight);
-	fn min_gas_price_default() -> (U256, Weight) {
-		Self::min_gas_price(None)
-	}
+	fn min_gas_price(_source_address: Option<&H160>, receiver_address: Option<&H160>) -> (U256, Weight);
 }
 
 impl FeeCalculator for () {
-	fn min_gas_price(_source_address: Option<&H160>) -> (U256, Weight) {
+	fn min_gas_price(_source_address: Option<&H160>, receiver_address: Option<&H160>) -> (U256, Weight) {
 		(U256::zero(), Weight::zero())
 	}
 }
