@@ -90,7 +90,7 @@ where
         ) -> (ExitReason, R),
         R: Default,
     {
-        log::info!("====== EVM Transaction ======= source: {:?}, value: {:?}", source, value);
+        // log::info!("====== EVM Transaction ======= source: {:?}, value: {:?}", source, value);
         let (base_fee, weight) = T::FeeCalculator::min_gas_price(None, None);
 
         #[cfg(feature = "forbid-evm-reentrancy")]
@@ -262,19 +262,19 @@ where
         let actual_base_fee = effective_gas.saturating_mul(base_fee);
 
 
-        log::info!(
-			"============== Execution ============= {:?} [source: {:?}, value: {}, gas_limit: {}, actual_fee: {}, used_gas: {}, effective_gas: {}, base_fee: {}, total_fee_per_gas: {}, is_transactional: {}]",
-			reason,
-			source,
-			value,
-			gas_limit,
-			actual_fee,
-			used_gas,
-			effective_gas,
-			base_fee,
-			total_fee_per_gas,
-			is_transactional
-		);
+        // log::info!(
+		// 	"============== Execution ============= {:?} [source: {:?}, value: {}, gas_limit: {}, actual_fee: {}, used_gas: {}, effective_gas: {}, base_fee: {}, total_fee_per_gas: {}, is_transactional: {}]",
+		// 	reason,
+		// 	source,
+		// 	value,
+		// 	gas_limit,
+		// 	actual_fee,
+		// 	used_gas,
+		// 	effective_gas,
+		// 	base_fee,
+		// 	total_fee_per_gas,
+		// 	is_transactional
+		// );
 
         log::debug!(
 			target: "evm",
@@ -386,11 +386,11 @@ where
         proof_size_base_cost: Option<u64>,
         evm_config: &evm::Config,
     ) -> Result<(), RunnerError<Self::Error>> {
-        log::info!("====== EVM Transaction ======= source validate function01 : {:?}, value: {:?}", source, value);
+        // log::info!("====== EVM Transaction ======= source validate function01 : {:?}, value: {:?}", source, value);
         let (base_fee, mut weight) = T::FeeCalculator::min_gas_price(None, None);
         let (source_account, inner_weight) = Pallet::<T>::account_basic(&source);
 
-        log::info!("====== EVM Transaction ======= source_account : {:?} and input, {:?}", &source_account, input);
+        // log::info!("====== EVM Transaction ======= source_account : {:?} and input, {:?}", &source_account, input);
 
         weight = weight.saturating_add(inner_weight);
 

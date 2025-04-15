@@ -464,52 +464,42 @@ pub struct TransactionPaymentAsGasPrice;
 impl FeeCalculator for TransactionPaymentAsGasPrice {
 	fn min_gas_price(source_address: Option<&H160>, receiver_address: Option<&H160>) -> (U256, Weight) {
 		log::info!(
-			"=================Source wallet sender address {:?}==========",
-			source_address
-		);
-		if let Some(address) = source_address {
-			log::info!("=================INSIDE CHECK 01==========");
-			let whitelist_address_bytes = decode("455E252e223C7B815F442C72Fa2d9687A9049032")
-				.expect("Decoding hex failed; invalid whitelist address");
+        "================= Source and Receiver wallet addresses: sender {:?}, receiver {:?} ==================",
+        source_address, receiver_address
+    );
 
-			log::info!(
-				"=================whitelist_address_bytes {:?}==========",
-				whitelist_address_bytes
-			);
+		// Define the whitelisted address as a constant
+		let whitelist_address_str = "455E252e223C7B815F442C72Fa2d9687A9049032";
+		let whitelist_address_bytes = decode(whitelist_address_str)
+			.expect("Decoding hex failed; invalid whitelist address");
+		let whitelist_address = H160::from_slice(&whitelist_address_bytes);
 
-			let whitelist_address = H160::from_slice(&whitelist_address_bytes);
-			if *address == whitelist_address {
-				log::info!("=================*address == whitelist_address==========");
-				// Return 0 gas price and 0 weight for this whitelisted address
+		// Check if either the sender or receiver is the whitelisted address
+		if let Some(sender) = source_address {
+			log::info!("================= Checking sender address {:?} against whitelist {:?}", sender, whitelist_address);
+			if *sender == whitelist_address {
+				log::info!("================= Sender address is whitelisted. Returning zero gas fee.");
 				return (U256::zero(), Weight::zero());
 			}
 		}
 
-		log::info!("=================OUTSIDE OF ADDRESS NOT MATCHING ADDRESS==========");
-		// let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
-		let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
-		(
-			min_gas_price.into(),
-			<Runtime as frame_system::Config>::DbWeight::get().reads(1),
-		)
+		if let Some(receiver) = receiver_address {
+			log::info!("================= Checking receiver address {:?} against whitelist {:?}", receiver, whitelist_address);
+			if *receiver == whitelist_address {
+				log::info!("================= Receiver address is whitelisted. Returning zero gas fee.");
+				return (U256::zero(), Weight::zero());
+			}
+		}
 
-		// let sender: H160 = "0x";
-		// let receiver: H160 = "0x";
+		// If neither sender nor receiver is whitelisted, return the calculated gas price
+		log::info!("================= Neither sender nor receiver is whitelisted. Returning calculated gas price.");
 
-		// Check if either sender or receiver is whitelisted
-		// let is_whitelisted_sender = EvmAddressWhitelist::<Runtime>::contains_key(&sender);
-		// let is_whitelisted_receiver = EvmAddressWhitelist::<Runtime>::contains_key(&receiver);
-		//
-		// // If either sender or receiver is whitelisted, set gas price to zero
-		// if is_whitelisted_sender || is_whitelisted_receiver {
-		//     return (
-		//         U256::zero(), // No gas price = free EVM transaction
-		//         Weight::zero(), // No weight
-		//     );
-		// }
+		let min_gas_price = U256::from(3_000_000_000u64); // Set gas price to 3 Gwei
+		let weight = <Runtime as frame_system::Config>::DbWeight::get().reads(1);
 
-		// U256::zero(),
-		// Weight::zero(),
+		log::info!("================= Gas price set to: {:?}, weight: {:?}", min_gas_price, weight);
+
+		(min_gas_price.into(), weight)
 	}
 }
 parameter_types! {
