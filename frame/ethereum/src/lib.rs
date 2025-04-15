@@ -507,14 +507,14 @@ impl<T: Config> Pallet<T> {
 		let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&origin), Option::from(target_address_opt.as_ref()));
 		let (who, _) = pallet_evm::Pallet::<T>::account_basic(&origin);
 
-		log::info!(
-			"============ Possible equivocation at ethereum block hash {}",
-			&origin
-		);
-		log::info!(
-            "==============pallet-ethereum========= validate_transaction_in_pool: {:?} and tranaction data {:?}",
-            &origin, transaction_target
-        );
+		// log::info!(
+		// 	"============ Possible equivocation at ethereum block hash {}",
+		// 	&origin
+		// );
+		// log::info!(
+        //     "==============pallet-ethereum========= validate_transaction_in_pool: {:?} and tranaction data {:?}",
+        //     &origin, transaction_target
+        // );
 
 		let _ = CheckEvmTransaction::<InvalidTransactionWrapper>::new(
 			CheckEvmTransactionConfig {
@@ -806,11 +806,11 @@ impl<T: Config> Pallet<T> {
 			}
 		};
 
-		log::info!(
-			"======== execute ethereum transaction ======= {:?}, {}",
-			input,
-			value
-		);
+		// log::info!(
+		// 	"======== execute ethereum transaction ======= {:?}, {}",
+		// 	input,
+		// 	value
+		// );
 
 		match action {
 			ethereum::TransactionAction::Call(target) => {
@@ -842,10 +842,10 @@ impl<T: Config> Pallet<T> {
 					}
 				};
 
-				log::info!(
-                    "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
-                    from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
-                );
+				// log::info!(
+                //     "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                //     from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
+                // );
 
 				Ok((Some(target), None, CallOrCreateInfo::Call(res)))
 			}
@@ -877,10 +877,10 @@ impl<T: Config> Pallet<T> {
 					}
 				};
 
-				log::info!(
-                    "======== ethereum::TransactionAction::Create ======= from {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
-                    from, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
-                );
+				// log::info!(
+                //     "======== ethereum::TransactionAction::Create ======= from {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                //     from, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
+                // );
 
 				Ok((None, Some(res.value), CallOrCreateInfo::Create(res)))
 			}
@@ -906,11 +906,11 @@ impl<T: Config> Pallet<T> {
 		let (weight_limit, proof_size_base_cost) = Self::transaction_weight(&transaction_data);
 		let (who, _) = pallet_evm::Pallet::<T>::account_basic(&origin);
 
-		log::info!("Possible equivocation at ethereum block hash {}", &origin);
-		log::info!(
-            "========= pallet-ethereum validate_transaction_in_block ========= INFO Zero gas price applied for sender: {:?}, and tranaction data {:?}",
-            &origin, &target_address_opt.as_ref()
-        );
+		// log::info!("Possible equivocation at ethereum block hash {}", &origin);
+		// log::info!(
+        //     "========= pallet-ethereum validate_transaction_in_block ========= INFO Zero gas price applied for sender: {:?}, and tranaction data {:?}",
+        //     &origin, &target_address_opt.as_ref()
+        // );
 
 		let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&origin), Option::from(target_address_opt.as_ref()));
 
