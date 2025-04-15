@@ -498,13 +498,15 @@ impl<T: Config> Pallet<T> {
 		let transaction_target = transaction_data.action;
 		let (weight_limit, proof_size_base_cost) = Self::transaction_weight(&transaction_data);
 
-
 		let target_address_opt = match transaction_target {
 			TransactionAction::Call(target_address) => Some(target_address),
 			TransactionAction::Create => None,
 		};
 
-		let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&origin), Option::from(target_address_opt.as_ref()));
+		let (base_fee, _) = T::FeeCalculator::min_gas_price(
+			Option::from(&origin),
+			Option::from(target_address_opt.as_ref()),
+		);
 		let (who, _) = pallet_evm::Pallet::<T>::account_basic(&origin);
 
 		// log::info!(
@@ -512,9 +514,9 @@ impl<T: Config> Pallet<T> {
 		// 	&origin
 		// );
 		// log::info!(
-        //     "==============pallet-ethereum========= validate_transaction_in_pool: {:?} and tranaction data {:?}",
-        //     &origin, transaction_target
-        // );
+		//     "==============pallet-ethereum========= validate_transaction_in_pool: {:?} and tranaction data {:?}",
+		//     &origin, transaction_target
+		// );
 
 		let _ = CheckEvmTransaction::<InvalidTransactionWrapper>::new(
 			CheckEvmTransactionConfig {
@@ -750,8 +752,8 @@ impl<T: Config> Pallet<T> {
 			input,
 			value,
 			gas_limit,
-			max_fee_per_gas,
-			max_priority_fee_per_gas,
+			 max_fee_per_gas,
+			 max_priority_fee_per_gas,
 			nonce,
 			action,
 			access_list,
@@ -806,6 +808,9 @@ impl<T: Config> Pallet<T> {
 			}
 		};
 
+		let max_fee_per_gas_2 = Option::from(U256::zero());
+		let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+
 		// log::info!(
 		// 	"======== execute ethereum transaction ======= {:?}, {}",
 		// 	input,
@@ -820,10 +825,8 @@ impl<T: Config> Pallet<T> {
 					input,
 					value,
 					gas_limit.unique_saturated_into(),
-					Option::from(U256::zero()),
-					Option::from(U256::zero()),
-					// max_fee_per_gas,
-					// max_priority_fee_per_gas,
+					max_fee_per_gas_2,
+					max_priority_fee_per_gas_2,
 					nonce,
 					access_list,
 					is_transactional,
@@ -845,8 +848,8 @@ impl<T: Config> Pallet<T> {
 				};
 
 				log::info!(
-                    "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
-                    from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
+                    "======== ethereum::TransactionAction::Call 12 ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                    from, target, value, gas_limit, max_fee_per_gas_2, max_priority_fee_per_gas_2
                 );
 
 				Ok((Some(target), None, CallOrCreateInfo::Call(res)))
@@ -857,10 +860,8 @@ impl<T: Config> Pallet<T> {
 					input,
 					value,
 					gas_limit.unique_saturated_into(),
-					Option::from(U256::zero()),
-					Option::from(U256::zero()),
-					// max_fee_per_gas,
-					// max_priority_fee_per_gas,
+					max_fee_per_gas_2,
+					max_priority_fee_per_gas_2,
 					nonce,
 					access_list,
 					is_transactional,
@@ -882,9 +883,9 @@ impl<T: Config> Pallet<T> {
 				};
 
 				// log::info!(
-                //     "======== ethereum::TransactionAction::Create ======= from {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
-                //     from, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
-                // );
+				//     "======== ethereum::TransactionAction::Create ======= from {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+				//     from, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
+				// );
 
 				Ok((None, Some(res.value), CallOrCreateInfo::Create(res)))
 			}
@@ -912,11 +913,14 @@ impl<T: Config> Pallet<T> {
 
 		// log::info!("Possible equivocation at ethereum block hash {}", &origin);
 		// log::info!(
-        //     "========= pallet-ethereum validate_transaction_in_block ========= INFO Zero gas price applied for sender: {:?}, and tranaction data {:?}",
-        //     &origin, &target_address_opt.as_ref()
-        // );
+		//     "========= pallet-ethereum validate_transaction_in_block ========= INFO Zero gas price applied for sender: {:?}, and tranaction data {:?}",
+		//     &origin, &target_address_opt.as_ref()
+		// );
 
-		let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&origin), Option::from(target_address_opt.as_ref()));
+		let (base_fee, _) = T::FeeCalculator::min_gas_price(
+			Option::from(&origin),
+			Option::from(target_address_opt.as_ref()),
+		);
 
 		let _ = CheckEvmTransaction::<InvalidTransactionWrapper>::new(
 			CheckEvmTransactionConfig {
