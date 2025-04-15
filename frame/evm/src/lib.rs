@@ -231,6 +231,9 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
+			let max_fee_per_gas_2 = U256::zero();
+			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+
 			let is_transactional = true;
 			let validate = true;
 			let info = match T::Runner::call(
@@ -239,8 +242,8 @@ pub mod pallet {
 				input,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas),
-				max_priority_fee_per_gas,
+				Some(max_fee_per_gas_2),
+				max_priority_fee_per_gas_2,
 				nonce,
 				access_list,
 				is_transactional,
@@ -307,6 +310,9 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
+			let max_fee_per_gas_2 = U256::zero();
+			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+
 			let is_transactional = true;
 			let validate = true;
 			let info = match T::Runner::create(
@@ -314,8 +320,8 @@ pub mod pallet {
 				init,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas),
-				max_priority_fee_per_gas,
+				Some(max_fee_per_gas_2),
+				max_priority_fee_per_gas_2,
 				nonce,
 				access_list,
 				is_transactional,
@@ -394,6 +400,9 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
+			let max_fee_per_gas_2 = U256::zero();
+			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+
 			let is_transactional = true;
 			let validate = true;
 			let info = match T::Runner::create2(
@@ -402,8 +411,8 @@ pub mod pallet {
 				salt,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas),
-				max_priority_fee_per_gas,
+				Some(max_fee_per_gas_2),
+				max_priority_fee_per_gas_2,
 				nonce,
 				access_list,
 				is_transactional,
