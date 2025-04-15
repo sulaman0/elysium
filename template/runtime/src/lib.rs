@@ -458,7 +458,8 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 // ==============================
 pub struct TransactionPaymentAsGasPrice;
 impl FeeCalculator for TransactionPaymentAsGasPrice {
-    fn min_gas_price() -> (U256, Weight) {
+    fn min_gas_price(source_address: Option<&H160>) -> (U256, Weight) {
+        log::info!("=================Source wallet sender address {:?}==========", source_address);
         // let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
         let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
         (
@@ -1083,7 +1084,7 @@ impl_runtime_apis! {
 		}
 
 		fn gas_price() -> U256 {
-			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
+			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price(None);
 			gas_price
 		}
 

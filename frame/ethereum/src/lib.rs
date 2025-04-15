@@ -837,8 +837,8 @@ impl<T: Config> Pallet<T> {
                 };
 
                 log::info!(
-                    "======== ethereum::TransactionAction ======= from {}, {}, {}",
-                    from, target, value
+                    "======== ethereum::TransactionAction::Call ======= from {}, Target: {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                    from, target, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
                 );
 
                 Ok((Some(target), None, CallOrCreateInfo::Call(res)))
@@ -872,8 +872,8 @@ impl<T: Config> Pallet<T> {
                 };
 
                 log::info!(
-                    "======== ethereum::TransactionAction::Create ======= from {}, {}",
-                    from, value
+                    "======== ethereum::TransactionAction::Create ======= from {}, Value: {}, GasLimit: {:?}, MaxFeePerGas: {:?}, MaxPriorityFeePerGas: {:?}",
+                    from, value, gas_limit, max_fee_per_gas, max_priority_fee_per_gas
                 );
 
                 Ok((None, Some(res.value), CallOrCreateInfo::Create(res)))
