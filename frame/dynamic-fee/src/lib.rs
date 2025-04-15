@@ -24,7 +24,7 @@ mod tests;
 
 use core::cmp::{max, min};
 use frame_support::{inherent::IsFatalError, traits::Get, weights::Weight};
-use sp_core::U256;
+use sp_core::{H160, U256};
 use sp_inherents::{InherentData, InherentIdentifier};
 
 pub use self::pallet::*;
@@ -137,7 +137,7 @@ pub mod pallet {
 }
 
 impl<T: Config> fp_evm::FeeCalculator for Pallet<T> {
-	fn min_gas_price() -> (U256, Weight) {
+	fn min_gas_price(source_address: Option<&H160>) -> (U256, Weight) {
 		(MinGasPrice::<T>::get(), T::DbWeight::get().reads(1))
 	}
 }
