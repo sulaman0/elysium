@@ -782,7 +782,7 @@ where
     }
 
     fn block_base_fee_per_gas(&self) -> U256 {
-        let (base_fee, _) = T::FeeCalculator::min_gas_price();
+        let (base_fee, _) = T::FeeCalculator::min_gas_price(None);
         base_fee
     }
 
