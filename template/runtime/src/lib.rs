@@ -459,7 +459,17 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 pub struct TransactionPaymentAsGasPrice;
 impl FeeCalculator for TransactionPaymentAsGasPrice {
     fn min_gas_price(source_address: Option<&H160>) -> (U256, Weight) {
+
         log::info!("=================Source wallet sender address {:?}==========", source_address);
+        if let Some(address) = source_address {
+            let whitelist_address = H160::from_str("0x455E252e223C7B815F442C72Fa2d9687A9049032").unwrap();
+
+            if *address == whitelist_address {
+                // Return 0 gas price and 0 weight for this whitelisted address
+                return (U256::zero(), Weight::zero());
+            }
+        }
+
         // let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
         let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
         (
