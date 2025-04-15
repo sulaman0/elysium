@@ -460,16 +460,30 @@ pub struct TransactionPaymentAsGasPrice;
 impl FeeCalculator for TransactionPaymentAsGasPrice {
     fn min_gas_price() -> (U256, Weight) {
         // let min_gas_price = TransactionPayment::next_fee_multiplier().saturating_mul_int(currency::WEIGHT_FEE.saturating_mul(WEIGHT_PER_GAS as u128));
-        // let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
-        // (
-        //     min_gas_price.into(),
-        //     <Runtime as frame_system::Config>::DbWeight::get().reads(1),
-        // )
-
+        let min_gas_price = U256::from(3_000_000_000u64); // Increase from 1.25 Gwei to 3 Gwei
         (
-            U256::zero(), // No gas price = free EVM tx
-            Weight::zero(), // No weight
+            min_gas_price.into(),
+            <Runtime as frame_system::Config>::DbWeight::get().reads(1),
         )
+
+        // let sender: H160 = "0x";
+        // let receiver: H160 = "0x";
+
+        // Check if either sender or receiver is whitelisted
+        // let is_whitelisted_sender = EvmAddressWhitelist::<Runtime>::contains_key(&sender);
+        // let is_whitelisted_receiver = EvmAddressWhitelist::<Runtime>::contains_key(&receiver);
+        //
+        // // If either sender or receiver is whitelisted, set gas price to zero
+        // if is_whitelisted_sender || is_whitelisted_receiver {
+        //     return (
+        //         U256::zero(), // No gas price = free EVM transaction
+        //         Weight::zero(), // No weight
+        //     );
+        // }
+
+        // U256::zero(),
+        // Weight::zero(),
+
     }
 }
 parameter_types! {

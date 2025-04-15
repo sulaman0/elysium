@@ -19,7 +19,6 @@
 #![warn(unused_crate_dependencies)]
 
 extern crate alloc;
-
 mod precompile;
 mod validation;
 
@@ -27,6 +26,7 @@ use alloc::{collections::BTreeMap, vec::Vec};
 use frame_support::weights::{constants::WEIGHT_REF_TIME_PER_MILLIS, Weight};
 use scale_codec::{Decode, Encode};
 use scale_info::TypeInfo;
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use sp_core::{H160, H256, U256};
@@ -233,11 +233,14 @@ pub struct GenesisAccount {
 /// Trait that outputs the current transaction gas price.
 pub trait FeeCalculator {
 	/// Return the minimal required gas price.
-	fn min_gas_price() -> (U256, Weight);
+	fn min_gas_price(source_address: Option<&H160>) -> (U256, Weight);
+	fn min_gas_price_default() -> (U256, Weight) {
+		Self::min_gas_price(None)
+	}
 }
 
 impl FeeCalculator for () {
-	fn min_gas_price() -> (U256, Weight) {
+	fn min_gas_price(source_address: Option<&H160>) -> (U256, Weight) {
 		(U256::zero(), Weight::zero())
 	}
 }
