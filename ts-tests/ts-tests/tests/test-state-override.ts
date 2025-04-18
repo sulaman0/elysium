@@ -30,7 +30,7 @@ describeWithFrontier("Frontier RPC (StateOverride)", (context) => {
 				from: GENESIS_ACCOUNT,
 				data,
 				value: Web3.utils.numberToHex(Web3.utils.toWei("1", "ether")),
-				gas: "0x100000",
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -44,8 +44,8 @@ describeWithFrontier("Frontier RPC (StateOverride)", (context) => {
 				from: GENESIS_ACCOUNT,
 				to: contractAddress,
 				data: contract.methods.setAllowance(otherAddress, 10).encodeABI(),
-				gas: "0x100000",
-				gasPrice: "0x3B9ACA00",
+				gas: GAS,
+				gasPrice: GAS_PRICE,
 				value: "0x0",
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY

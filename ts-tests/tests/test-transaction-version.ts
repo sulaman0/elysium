@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, CHAIN_ID, GAS_PRICE} from "./config";
 import { createAndFinalizeBlock, describeWithFrontier } from "./util";
 
 // We use ethers library in this test as apparently web3js's types are not fully EIP-1559 compliant yet.
@@ -23,7 +23,7 @@ describeWithFrontier("Frontier RPC (Transaction Version)", (context) => {
 			from: GENESIS_ACCOUNT,
 			data: TEST_CONTRACT_BYTECODE,
 			value: "0x00",
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 			type: 0,
 			nonce: 0,
 			gasLimit: "0x100000",
@@ -49,7 +49,7 @@ describeWithFrontier("Frontier RPC (Transaction Version)", (context) => {
 			from: GENESIS_ACCOUNT,
 			data: TEST_CONTRACT_BYTECODE,
 			value: "0x00",
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 			type: 1,
 			accessList: [],
 			nonce: 1,
@@ -76,7 +76,7 @@ describeWithFrontier("Frontier RPC (Transaction Version)", (context) => {
 			from: GENESIS_ACCOUNT,
 			data: TEST_CONTRACT_BYTECODE,
 			value: "0x00",
-			maxFeePerGas: "0x3B9ACA00",
+			maxFeePerGas: GAS_PRICE,
 			maxPriorityFeePerGas: "0x01",
 			type: 2,
 			accessList: [],

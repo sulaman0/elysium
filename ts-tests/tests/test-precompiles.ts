@@ -2,7 +2,7 @@ import { assert, expect } from "chai";
 import { AbiItem } from "web3-utils";
 
 import ECRecoverTests from "../build/contracts/ECRecoverTests.json";
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS } from "./config";
+import {GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY, FIRST_CONTRACT_ADDRESS, GAS_PRICE, GAS} from "./config";
 import { createAndFinalizeBlock, customRequest, describeWithFrontier } from "./util";
 
 describeWithFrontier("Frontier RPC (Precompile)", (context) => {
@@ -18,8 +18,8 @@ describeWithFrontier("Frontier RPC (Precompile)", (context) => {
 				from: GENESIS_ACCOUNT,
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -51,15 +51,15 @@ describeWithFrontier("Frontier RPC (Precompile)", (context) => {
 				to: "0000000000000000000000000000000000000005",
 				data: `0x${hash.toString()}${sigPart}`,
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
 
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 
 		await contract.methods.ecrecover(`0x${hash.toString()}${sigPart}`).call();
