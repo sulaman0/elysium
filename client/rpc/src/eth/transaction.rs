@@ -18,7 +18,7 @@
 
 use std::sync::Arc;
 
-use ethereum::TransactionV2 as EthereumTransaction;
+use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H256, U256, U64};
 use jsonrpsee::core::RpcResult;
 // Substrate
@@ -304,9 +304,10 @@ where
 							))?
 						};
 
+
 						self.client
 							.runtime_api()
-							.gas_price(base_fee_block_substrate_hash)
+							.gas_price(base_fee_block_substrate_hash, None,  None)
 							.unwrap_or_default()
 							.checked_add(t.max_priority_fee_per_gas)
 							.unwrap_or_else(U256::max_value)

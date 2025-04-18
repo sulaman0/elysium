@@ -50,6 +50,7 @@ where
 	CIDP: CreateInherentDataProviders<B, ()> + Send + 'static,
 {
 	pub async fn send_transaction(&self, request: TransactionRequest) -> RpcResult<H256> {
+		log::info!("================== SENDTRANSACTION ======== {:?}", request);
 		let from = match request.from {
 			Some(from) => from,
 			None => {
@@ -104,7 +105,7 @@ where
 				m.chain_id = Some(chain_id);
 				m.gas_limit = gas_limit;
 				if gas_price.is_none() {
-					m.gas_price = self.gas_price().unwrap_or_default();
+					m.gas_price = self.gas_price(None).unwrap_or_default();
 				}
 				TransactionMessage::Legacy(m)
 			}
@@ -113,16 +114,17 @@ where
 				m.chain_id = chain_id;
 				m.gas_limit = gas_limit;
 				if gas_price.is_none() {
-					m.gas_price = self.gas_price().unwrap_or_default();
+					m.gas_price = self.gas_price(None).unwrap_or_default();
 				}
 				TransactionMessage::EIP2930(m)
 			}
 			Some(TransactionMessage::EIP1559(mut m)) => {
+				log::info!("======== EIP1559 ========, {:?}", m);
 				m.nonce = nonce;
 				m.chain_id = chain_id;
 				m.gas_limit = gas_limit;
 				if max_fee_per_gas.is_none() {
-					m.max_fee_per_gas = self.gas_price().unwrap_or_default();
+					m.max_fee_per_gas = self.gas_price(None).unwrap_or_default();
 				}
 				TransactionMessage::EIP1559(m)
 			}

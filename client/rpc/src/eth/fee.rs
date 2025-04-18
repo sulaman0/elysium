@@ -23,6 +23,7 @@ use sc_client_api::backend::{Backend, StorageProvider};
 use sc_transaction_pool::ChainApi;
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::HeaderBackend;
+use sp_core::H160;
 use sp_runtime::{
 	traits::{Block as BlockT, UniqueSaturatedInto},
 	Permill,
@@ -42,12 +43,13 @@ where
 	BE: Backend<B> + 'static,
 	A: ChainApi<Block = B>,
 {
-	pub fn gas_price(&self) -> RpcResult<U256> {
+	pub fn gas_price(&self, fee_option: Option<U256>) -> RpcResult<U256> {
 		let block_hash = self.client.info().best_hash;
 
+		// let receiver = Option::from(U256::zero());
 		self.client
 			.runtime_api()
-			.gas_price(block_hash)
+			.gas_price(block_hash, None, None)
 			.map_err(|err| internal_err(format!("fetch runtime chain id failed: {:?}", err)))
 	}
 

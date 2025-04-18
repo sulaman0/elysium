@@ -92,6 +92,7 @@ where
     {
         // log::info!("====== EVM Transaction ======= source: {:?}, value: {:?}", source, value);
         let (base_fee, weight) = T::FeeCalculator::min_gas_price(Option::from(&source), None);
+        // let (base_fee, weight) = (U256::zero(), Weight::zero());
 
         #[cfg(feature = "forbid-evm-reentrancy")]
         if IN_EVM.with(|in_evm| in_evm.replace(true)) {
@@ -263,18 +264,18 @@ where
 
 
         // log::info!(
-		// 	"============== Execution ============= {:?} [source: {:?}, value: {}, gas_limit: {}, actual_fee: {}, used_gas: {}, effective_gas: {}, base_fee: {}, total_fee_per_gas: {}, is_transactional: {}]",
-		// 	reason,
-		// 	source,
-		// 	value,
-		// 	gas_limit,
-		// 	actual_fee,
-		// 	used_gas,
-		// 	effective_gas,
-		// 	base_fee,
-		// 	total_fee_per_gas,
-		// 	is_transactional
-		// );
+        // 	"============== Execution ============= {:?} [source: {:?}, value: {}, gas_limit: {}, actual_fee: {}, used_gas: {}, effective_gas: {}, base_fee: {}, total_fee_per_gas: {}, is_transactional: {}]",
+        // 	reason,
+        // 	source,
+        // 	value,
+        // 	gas_limit,
+        // 	actual_fee,
+        // 	used_gas,
+        // 	effective_gas,
+        // 	base_fee,
+        // 	total_fee_per_gas,
+        // 	is_transactional
+        // );
 
         log::debug!(
 			target: "evm",
@@ -387,6 +388,7 @@ where
         evm_config: &evm::Config,
     ) -> Result<(), RunnerError<Self::Error>> {
         // log::info!("====== EVM Transaction ======= source validate function01 : {:?}, value: {:?}", source, value);
+        // let (base_fee, mut weight) = (U256::zero(), Weight::zero());
         let (base_fee, mut weight) = T::FeeCalculator::min_gas_price(Option::from(&source), None);
         let (source_account, inner_weight) = Pallet::<T>::account_basic(&source);
 
@@ -782,7 +784,8 @@ where
     }
 
     fn block_base_fee_per_gas(&self) -> U256 {
-        let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&self.vicinity.origin), None);
+        // let (base_fee, _) = T::FeeCalculator::min_gas_price(Option::from(&self.vicinity.origin), None);
+        let (base_fee, _) = ( U256::zero(), Weight::zero());
         base_fee
     }
 

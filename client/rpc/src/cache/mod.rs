@@ -309,7 +309,7 @@ where
 
 			let block = storage_override.current_block(hash);
 			let mut block_number: Option<u64> = None;
-			let base_fee = client.runtime_api().gas_price(hash).unwrap_or_default();
+			let base_fee = client.runtime_api().gas_price(hash, None, None).unwrap_or_default();
 			let receipts = storage_override.current_receipts(hash);
 			let mut result = FeeHistoryCacheItem {
 				base_fee: UniqueSaturatedInto::<u64>::unique_saturated_into(base_fee),

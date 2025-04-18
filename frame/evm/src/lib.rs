@@ -198,8 +198,11 @@ pub mod pallet {
 			address: H160,
 			value: BalanceOf<T>,
 		) -> DispatchResult {
+
 			let destination = T::WithdrawOrigin::ensure_address_origin(&address, origin)?;
 			let address_account_id = T::AddressMapping::into_account_id(address);
+
+			log::info!("============= withdraw function in EVM ===== {:?} destination and {:?} source", &destination, &address_account_id);
 
 			T::Currency::transfer(
 				&address_account_id,
@@ -231,8 +234,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
-			let max_fee_per_gas_2 = U256::zero();
-			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+			log::info!("============= Call function ===== {:?} destination and {:?} source", &source, &target);
 
 			let is_transactional = true;
 			let validate = true;
@@ -242,8 +244,8 @@ pub mod pallet {
 				input,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas_2),
-				max_priority_fee_per_gas_2,
+				Some(max_fee_per_gas),
+				max_priority_fee_per_gas,
 				nonce,
 				access_list,
 				is_transactional,
@@ -310,8 +312,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
-			let max_fee_per_gas_2 = U256::zero();
-			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+			log::info!("============= Call function ===== {:?} destination and {:?} source", &source, &value);
 
 			let is_transactional = true;
 			let validate = true;
@@ -320,8 +321,8 @@ pub mod pallet {
 				init,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas_2),
-				max_priority_fee_per_gas_2,
+				Some(max_fee_per_gas),
+				max_priority_fee_per_gas,
 				nonce,
 				access_list,
 				is_transactional,
@@ -400,8 +401,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			T::CallOrigin::ensure_address_origin(&source, origin)?;
 
-			let max_fee_per_gas_2 = U256::zero();
-			let max_priority_fee_per_gas_2 = Option::from(U256::zero());
+			log::info!("============= Call function ===== {:?} destination and {:?} source", &source, &value);
 
 			let is_transactional = true;
 			let validate = true;
@@ -411,8 +411,8 @@ pub mod pallet {
 				salt,
 				value,
 				gas_limit,
-				Some(max_fee_per_gas_2),
-				max_priority_fee_per_gas_2,
+				Some(max_fee_per_gas),
+				max_priority_fee_per_gas,
 				nonce,
 				access_list,
 				is_transactional,

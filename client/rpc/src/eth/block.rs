@@ -108,7 +108,7 @@ where
 					.current_transaction_statuses(substrate_hash)
 					.await;
 
-				let base_fee = client.runtime_api().gas_price(substrate_hash).ok();
+				let base_fee = client.runtime_api().gas_price(substrate_hash, None, None).ok();
 
 				match (block, statuses) {
 					(Some(block), Some(statuses)) => {
@@ -165,7 +165,7 @@ where
 					.pending_block(best_hash, xts)
 					.map_err(|_| internal_err(format!("Runtime access error at {}", best_hash)))?;
 
-				let base_fee = api.gas_price(best_hash).ok();
+				let base_fee = api.gas_price(best_hash, None, None).ok();
 
 				match (block, statuses) {
 					(Some(block), Some(statuses)) => Ok(Some(rich_block_build(

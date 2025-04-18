@@ -93,7 +93,7 @@ sp_api::decl_runtime_apis! {
 		fn account_basic(address: Address) -> fp_evm::Account;
 
 		/// Returns FixedGasPrice::min_gas_price
-		fn gas_price() -> U256;
+		fn gas_price(sender_address: Option<Address>, receiver_address: Option<U256>) -> U256;
 
 		/// For a given account address, returns pallet_evm::AccountCodes.
 		fn account_code_at(address: Address) -> Vec<u8>;

@@ -233,7 +233,7 @@ where
 		let base_fee = self
 			.client
 			.runtime_api()
-			.gas_price(substrate_hash)
+			.gas_price(substrate_hash, None, None)
 			.unwrap_or_default();
 
 		Ok(BlockInfo::new(
@@ -489,7 +489,7 @@ where
 	// ########################################################################
 
 	fn gas_price(&self) -> RpcResult<U256> {
-		self.gas_price()
+		self.gas_price(Option::from(U256::zero()))
 	}
 
 	async fn fee_history(
