@@ -7,7 +7,7 @@ import {
 	GENESIS_ACCOUNT_PRIVATE_KEY,
 	FIRST_CONTRACT_ADDRESS,
 	BLOCK_HASH_COUNT,
-	ETH_BLOCK_GAS_LIMIT,
+	ETH_BLOCK_GAS_LIMIT, GAS_PRICE, GAS,
 } from "./config";
 import { createAndFinalizeBlock, createAndFinalizeBlockNowait, customRequest, describeWithFrontier } from "./util";
 
@@ -25,8 +25,8 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 				from: GENESIS_ACCOUNT,
 				data: TEST_CONTRACT_BYTECODE,
 				value: "0x00",
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -46,7 +46,7 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 	it("should return contract method result", async function () {
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 
 		expect(await contract.methods.multiply(3).call()).to.equal("21");
@@ -55,7 +55,7 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 		// Solidity `block.number` is expected to return the same height at which the runtime call was made.
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 		let block = await context.web3.eth.getBlock("latest");
 		expect(await contract.methods.currentBlock().call()).to.eq(block.number.toString());
@@ -69,11 +69,12 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 		// Solidity `blockhash` is expected to return the ethereum block hash at a given height.
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 		let number = (await context.web3.eth.getBlock("latest")).number;
 		let last = number + BLOCK_HASH_COUNT;
 		for (let i = number; i <= last; i++) {
+			await new Promise((resolve) => setTimeout(resolve, 60));
 			let hash = (await context.web3.eth.getBlock("latest")).hash;
 			expect(await contract.methods.blockHash(i).call()).to.eq(hash);
 			await createAndFinalizeBlockNowait(context.web3);
@@ -87,7 +88,7 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 	it("should get correct environmental block gaslimit", async function () {
 		const contract = new context.web3.eth.Contract(TEST_CONTRACT_ABI, FIRST_CONTRACT_ADDRESS, {
 			from: GENESIS_ACCOUNT,
-			gasPrice: "0x3B9ACA00",
+			gasPrice: GAS_PRICE,
 		});
 		expect(await contract.methods.gasLimit().call()).to.eq(ETH_BLOCK_GAS_LIMIT.toString());
 	});
@@ -99,7 +100,7 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 			FIRST_CONTRACT_ADDRESS,
 			{
 				from: GENESIS_ACCOUNT,
-				gasPrice: "0x3B9ACA00",
+				gasPrice: GAS_PRICE,
 			}
 		);
 		await contract.methods
@@ -125,7 +126,7 @@ describeWithFrontier("Frontier RPC (Contract Methods)", (context) => {
 			FIRST_CONTRACT_ADDRESS,
 			{
 				from: GENESIS_ACCOUNT,
-				gasPrice: "0x3B9ACA00",
+				gasPrice: GAS_PRICE,
 			}
 		);
 		await contract.methods

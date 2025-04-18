@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { step } from "mocha-steps";
 
-import { GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY } from "./config";
+import {GAS, GAS_PRICE, GENESIS_ACCOUNT, GENESIS_ACCOUNT_PRIVATE_KEY} from "./config";
 import { createAndFinalizeBlock, describeWithFrontier, customRequest } from "./util";
 
 describeWithFrontier("Frontier RPC (Nonce)", (context) => {
@@ -14,8 +14,8 @@ describeWithFrontier("Frontier RPC (Nonce)", (context) => {
 				from: GENESIS_ACCOUNT,
 				to: TEST_ACCOUNT,
 				value: "0x200", // Must be higher than ExistentialDeposit
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY
 		);
@@ -43,8 +43,8 @@ describeWithFrontier("Frontier RPC (Nonce)", (context) => {
 				from: GENESIS_ACCOUNT,
 				to: TEST_ACCOUNT,
 				value: "0x400", // Must be higher than ExistentialDeposit
-				gasPrice: "0x3B9ACA00",
-				gas: "0x100000",
+				gasPrice: GAS_PRICE,
+				gas: GAS,
 				nonce: 0,
 			},
 			GENESIS_ACCOUNT_PRIVATE_KEY

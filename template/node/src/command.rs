@@ -1,20 +1,3 @@
-// This file is part of Substrate.
-
-// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 use futures::TryFutureExt;
 // Substrate
 use sc_cli::{ChainSpec, SubstrateCli};
@@ -33,7 +16,7 @@ use crate::chain_spec::get_account_id_from_seed;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Frontier Node".into()
+		"Elysium Node".into()
 	}
 
 	fn impl_version() -> String {
@@ -49,7 +32,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"support.anonymous.an".into()
+		"docs.elysiumchain.tech".into()
 	}
 
 	fn copyright_start_year() -> i32 {
@@ -62,6 +45,7 @@ impl SubstrateCli for Cli {
 				let enable_manual_seal = self.sealing.map(|_| true).unwrap_or_default();
 				Box::new(chain_spec::development_config(enable_manual_seal))
 			}
+			"live" => Box::new(chain_spec::prod_mainnet_config()),
 			"" | "local" => Box::new(chain_spec::local_testnet_config()),
 			path => Box::new(chain_spec::ChainSpec::from_json_file(
 				std::path::PathBuf::from(path),
@@ -179,13 +163,12 @@ pub fn run() -> sc_cli::Result<()> {
 			use frame_benchmarking_cli::{
 				BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE,
 			};
-			use elysium_runtime::{ExistentialDeposit, Hashing};
+			use elysium_runtime::{Hashing, EXISTENTIAL_DEPOSIT};
 
 			let runner = cli.create_runner(cmd)?;
 			match cmd {
-				BenchmarkCmd::Pallet(cmd) => {
-					runner.sync_run(|config| cmd.run::<Hashing, ()>(config))
-				}
+				BenchmarkCmd::Pallet(cmd) => runner
+					.sync_run(|config| cmd.run_with_spec::<Hashing, ()>(Some(config.chain_spec))),
 				BenchmarkCmd::Block(cmd) => runner.sync_run(|mut config| {
 					let (client, _, _, _, _) = service::new_chain_ops(&mut config, &cli.eth)?;
 					cmd.run(client)
@@ -215,7 +198,7 @@ pub fn run() -> sc_cli::Result<()> {
 						Box::new(TransferKeepAliveBuilder::new(
 							client.clone(),
 							get_account_id_from_seed::<sp_core::ecdsa::Public>("Alice"),
-							ExistentialDeposit::get(),
+							EXISTENTIAL_DEPOSIT,
 						)),
 					]);
 
@@ -236,7 +219,7 @@ pub fn run() -> sc_cli::Result<()> {
 				let (client, _, _, _, frontier_backend) =
 					service::new_chain_ops(&mut config, &cli.eth)?;
 				let frontier_backend = match frontier_backend {
-					fc_db::Backend::KeyValue(kv) => std::sync::Arc::new(kv),
+					fc_db::Backend::KeyValue(kv) => kv,
 					_ => panic!("Only fc_db::Backend::KeyValue supported"),
 				};
 				cmd.run(client, frontier_backend)

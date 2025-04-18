@@ -1,12 +1,12 @@
 [package]
 name = "elysium-runtime"
-version = "8.0.0"
-license = "Unlicense"
-description = "A fresh FRAME-based Substrate runtime, ready for hacking."
+license = 'GPL-3.0-only'
+description = "Elysium provides the lightning-fast transaction speeds and unprecedented scalability. Elysium is optimized for your Game, NFT, AI, or metaverse project."
 publish = false
 authors = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
+version = {workspace = true}
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -15,7 +15,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 smallvec = { workspace = true }
 scale-codec = { package = "parity-scale-codec", workspace = true }
 scale-info = { workspace = true }
-bs58 = { workspace = true }
+#bs58 = { workspace = true }
 # Substrate
 sp-api = { workspace = true }
 sp-block-builder = { workspace = true }
@@ -66,6 +66,7 @@ pallet-evm-precompile-simple = { workspace = true }
 pallet-hotfix-sufficients = { workspace = true }
 pallet-session = { workspace = true }
 pallet-authorship = { workspace = true }
+log = "0.4.25"
 
 [build-dependencies]
 substrate-wasm-builder = { workspace = true, optional = true }
