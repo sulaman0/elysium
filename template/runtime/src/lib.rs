@@ -40,10 +40,7 @@ use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
     Call::transact, PostLogContent, Transaction as EthereumTransaction
 };
-use pallet_evm::{
-    Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner,
-    EVMCurrencyAdapter, GasWeightMapping
-};
+use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner, EVMCurrencyAdapter, GasWeightMapping, OnChargeEVMTransaction, AddressMapping};
 use frame_system::EnsureRoot;
 use smallvec::smallvec;
 pub use frame_support::{
@@ -57,6 +54,7 @@ pub use frame_support::{
     },
     dispatch::{DispatchClass, GetDispatchInfo, PostDispatchInfo},
 };
+use frame_support::traits::{Currency, Imbalance};
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -452,6 +450,66 @@ impl FeeCalculator for TransactionPaymentAsGasPrice {
         )
     }
 }
+
+// Hardcoded addresses
+// Hardcoded addresses (use static lazy to avoid const fn issue)
+static ADDRESS_A: H160 = H160([
+    0x45, 0x5E, 0x25, 0x2e, 0x22, 0x3C, 0x7B, 0x81, 0x5F, 0x44, 0x2C, 0x72, 0xFa, 0x2d, 0x96, 0x87, 0xA9, 0x04, 0x90, 0x32,
+]);
+static ADDRESS_C: H160 = H160([
+    0xbe, 0x3a, 0xC1, 0x84, 0x5D, 0x06, 0x06, 0x51, 0x7F, 0xE5, 0xEC, 0x95, 0xa3, 0xb8, 0xa0, 0xba, 0x5B, 0x32, 0x28, 0x61,
+]);
+
+// Custom OnChargeTransaction for sponsor fees
+pub struct SponsorFeeAdapter<C, D>(sp_std::marker::PhantomData<(C, D)>);
+
+impl<T, C, D> OnChargeEVMTransaction<T> for SponsorFeeAdapter<C, D>
+where
+    T: pallet_evm::Config,
+    C: Currency<T::AccountId>,
+    D: OnChargeEVMTransaction<T, LiquidityInfo = Option<C::NegativeImbalance>>,
+    C::NegativeImbalance: Imbalance<C::Balance>,
+    C::Balance: TryFrom<U256> + TryInto<u128>,
+{
+    type LiquidityInfo = Option<C::NegativeImbalance>;
+
+    fn withdraw_fee(
+        sender: &H160,
+        fee: U256,
+    ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
+        if *sender == ADDRESS_A {
+            // Deduct fee from sponsor (Address C)
+            let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
+            let fee_balance = fee.try_into().map_err(|_| pallet_evm::Error::<T>::BalanceLow)?;
+            Ok(Some(C::withdraw(
+                &sponsor_account,
+                fee_balance,
+                frame_support::traits::WithdrawReasons::FEE,
+                frame_support::traits::ExistenceRequirement::KeepAlive,
+            ).map_err(|_| pallet_evm::Error::<T>::BalanceLow)?))
+        } else {
+            D::withdraw_fee(sender, fee)
+        }
+    }
+
+    fn correct_and_deposit_fee(
+        sender: &H160,
+        corrected_fee: U256,
+        base_fee: U256,
+        already_withdrawn: Self::LiquidityInfo,
+    ) -> Self::LiquidityInfo {
+        if *sender == ADDRESS_A {
+            already_withdrawn // No correction for sponsored fees
+        } else {
+            D::correct_and_deposit_fee(sender, corrected_fee, base_fee, already_withdrawn)
+        }
+    }
+
+    fn pay_priority_fee(tip: Self::LiquidityInfo) {
+        D::pay_priority_fee(tip);
+    }
+}
+
 parameter_types! {
     pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
@@ -477,7 +535,11 @@ impl pallet_evm::Config for Runtime {
     type ChainId = EVMChainId;
     type BlockGasLimit = BlockGasLimit;
     type Runner = pallet_evm::runner::stack::Runner<Self>;
-    type OnChargeTransaction = EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>;
+    // type OnChargeTransaction = EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>;
+    type OnChargeTransaction = SponsorFeeAdapter<
+        Balances,
+        EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>,
+    >;
     type OnCreate = ();
     type FindAuthor = FindAuthorTruncated<Aura>;
     type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
