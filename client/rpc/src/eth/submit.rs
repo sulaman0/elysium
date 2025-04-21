@@ -16,7 +16,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use ethereum_types::H256;
+use ethereum_types::{H256, U256};
+
+
 use futures::future::TryFutureExt;
 use jsonrpsee::core::RpcResult;
 // Substrate
@@ -158,6 +160,7 @@ where
 	}
 
 	pub async fn send_raw_transaction(&self, bytes: Bytes) -> RpcResult<H256> {
+		log::info!("================== SENDTRANSACTION raw ======== {:?}", bytes);
 		let bytes = bytes.into_vec();
 		if bytes.is_empty() {
 			return Err(internal_err("transaction data is empty"));
@@ -168,8 +171,10 @@ where
 				Ok(transaction) => transaction,
 				Err(_) => return Err(internal_err("decode transaction failed")),
 			};
-		let transaction_hash = transaction.hash();
 
+		log::info!("===== SEND RAW TRANSACTION ==== {:?}", transaction);
+
+		let transaction_hash = transaction.hash();
 		let block_hash = self.client.info().best_hash;
 		let extrinsic = self.convert_transaction(block_hash, transaction)?;
 
@@ -183,8 +188,20 @@ where
 	fn convert_transaction(
 		&self,
 		block_hash: B::Hash,
-		transaction: ethereum::TransactionV2,
+		mut transaction: ethereum::TransactionV2,
 	) -> RpcResult<B::Extrinsic> {
+
+		let default_gas_price = self.gas_price(None).unwrap_or(U256::from(1000000000)); // 1 Gwei
+		match &mut transaction {
+			ethereum::TransactionV2::Legacy(t) => t.gas_price = default_gas_price,
+			ethereum::TransactionV2::EIP2930(t) => t.gas_price = default_gas_price,
+			ethereum::TransactionV2::EIP1559(t) => {
+				t.max_fee_per_gas = default_gas_price;
+				t.max_priority_fee_per_gas = default_gas_price;
+			}
+		}
+
+
 		let api_version = match self
 			.client
 			.runtime_api()
@@ -193,6 +210,7 @@ where
 			Ok(api_version) => api_version,
 			_ => return Err(internal_err("cannot access `ConvertTransactionRuntimeApi`")),
 		};
+
 
 		match api_version {
 			Some(2) => match self
