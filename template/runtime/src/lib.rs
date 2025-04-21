@@ -27,14 +27,12 @@ pub use frame_support::{
         WeightToFeePolynomial,
     },
 };
+use frame_support::traits::{Currency, Imbalance};
 pub use frame_system::Call as SystemCall;
 use frame_system::EnsureRoot;
 pub use pallet_balances::Call as BalancesCall;
 use pallet_ethereum::{Call::transact, PostLogContent, Transaction as EthereumTransaction};
-use pallet_evm::{
-    Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator,
-    GasWeightMapping, HashedAddressMapping, Runner,
-};
+use pallet_evm::{Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator, GasWeightMapping, HashedAddressMapping, OnChargeEVMTransaction, Runner};
 pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::{FungibleAdapter, Multiplier, TargetedFeeAdjustment};
 use scale_codec::{Decode, Encode};
@@ -513,6 +511,51 @@ parameter_types! {
 	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
 }
 
+// Gasless allowlist (use hex literal to avoid const fn issue)
+
+// Custom OnChargeTransaction
+pub struct GaslessTransactionAdapter<C, D>(sp_std::marker::PhantomData<(C, D)>);
+
+impl<T, C, D> OnChargeEVMTransaction<T> for GaslessTransactionAdapter<C, D>
+where
+    T: pallet_evm::Config,
+    C: Currency<T::AccountId>,
+    D: OnChargeEVMTransaction<T, LiquidityInfo = Option<C::NegativeImbalance>>,
+    C::NegativeImbalance: Imbalance<C::Balance>,
+{
+    type LiquidityInfo = Option<C::NegativeImbalance>;
+
+    fn withdraw_fee(
+        sender: &H160,
+        fee: U256,
+    ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
+        Ok(None) // Skip fee for gasless
+        // if GASLESS_ADDRESSES.contains(sender) {
+        //
+        // } else {
+        //     D::withdraw_fee(sender, fee)
+        // }
+    }
+
+    fn correct_and_deposit_fee(
+        sender: &H160,
+        corrected_fee: U256,
+        base_fee: U256,
+        already_withdrawn: Self::LiquidityInfo,
+    ) -> Self::LiquidityInfo {
+        // if GASLESS_ADDRESSES.contains(sender) {
+        //     already_withdrawn // No correction for gasless
+        // } else {
+        //     D::correct_and_deposit_fee(sender, corrected_fee, base_fee, already_withdrawn)
+        // }
+        already_withdrawn
+    }
+
+    fn pay_priority_fee(tip: Self::LiquidityInfo) {
+        D::pay_priority_fee(tip);
+    }
+}
+
 impl pallet_evm::Config for Runtime {
     type FeeCalculator = TransactionPaymentAsGasPrice;
     type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
@@ -528,7 +571,10 @@ impl pallet_evm::Config for Runtime {
     type ChainId = EVMChainId;
     type BlockGasLimit = BlockGasLimit;
     type Runner = pallet_evm::runner::stack::Runner<Self>;
-    type OnChargeTransaction = EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>;
+    type OnChargeTransaction = GaslessTransactionAdapter<
+        Balances,
+        EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>,
+    >;
     type OnCreate = ();
     type FindAuthor = FindAuthorTruncated<Aura>;
     type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
