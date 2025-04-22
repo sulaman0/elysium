@@ -38,7 +38,7 @@ use sp_genesis_builder::PresetId;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
-    Call::transact, PostLogContent, Transaction as EthereumTransaction
+    Call::transact, PostLogContent, Transaction as EthereumTransaction,
 };
 use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner, EVMCurrencyAdapter, GasWeightMapping, OnChargeEVMTransaction, AddressMapping};
 use frame_system::EnsureRoot;
@@ -467,7 +467,7 @@ impl<T, C, D> OnChargeEVMTransaction<T> for SponsorFeeAdapter<C, D>
 where
     T: pallet_evm::Config,
     C: Currency<T::AccountId>,
-    D: OnChargeEVMTransaction<T, LiquidityInfo = Option<C::NegativeImbalance>>,
+    D: OnChargeEVMTransaction<T, LiquidityInfo=Option<C::NegativeImbalance>>,
     C::NegativeImbalance: Imbalance<C::Balance>,
     C::Balance: TryFrom<U256> + TryInto<u128>,
 {
@@ -477,6 +477,7 @@ where
         sender: &H160,
         fee: U256,
     ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
+
         if *sender == ADDRESS_A {
             // Deduct fee from sponsor (Address C)
             let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
@@ -734,6 +735,13 @@ pub mod pallet_manual_seal {
 impl pallet_manual_seal::Config for Runtime {}
 
 // ==============================
+// @@ Pallet Gasless @@
+// Purpose:
+// Properties:
+// ==============================
+impl pallet_gasless::Config for Runtime {}
+
+// ==============================
 // @@ Construct Runtime  @@
 // Purpose:
 // Properties:
@@ -814,6 +822,9 @@ mod runtime {
 
     #[runtime::pallet_index(19)]
     pub type ManualSeal = pallet_manual_seal;
+
+    #[runtime::pallet_index(20)]
+    pub type Gasless = pallet_gasless;
 }
 
 #[derive(Clone)]
@@ -1111,9 +1122,21 @@ impl_runtime_apis! {
 		}
 
 		fn gas_price() -> U256 {
+
+            // if pallet_gasless::Pallet::<Runtime>::is_gasless() {
+            //     U256::zero()
+            // } else {
+            //     let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
+            //     gas_price
+            // }
+
 			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
 			gas_price
 		}
+
+        fn set_is_gasless(flag: bool) -> () {
+           // pallet_gasless::Pallet::<Runtime>::set_is_gasless(flag);
+        }
 
 		fn account_code_at(address: H160) -> Vec<u8> {
 			pallet_evm::AccountCodes::<Runtime>::get(address)

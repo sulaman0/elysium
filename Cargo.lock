@@ -2035,6 +2035,7 @@ dependencies = [
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
+ "pallet-gasless",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-insecure-randomness-collective-flip",
@@ -6182,6 +6183,15 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-core",
+]
+
+[[package]]
+name = "pallet-gasless"
+version = "1.0.0-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "sp-std",
 ]
 
 [[package]]

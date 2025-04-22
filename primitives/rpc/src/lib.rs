@@ -104,6 +104,9 @@ sp_api::decl_runtime_apis! {
 		/// For a given account address and index, returns pallet_evm::AccountStorages.
 		fn storage_at(address: Address, index: U256) -> H256;
 
+		// set flag for gas less
+		fn set_is_gasless(flag: bool) -> ();
+
 		/// Returns a frame_ethereum::call response. If `estimate` is true,
 		#[changed_in(2)]
 		fn call(

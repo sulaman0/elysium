@@ -49,6 +49,7 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 pallet-insecure-randomness-collective-flip = { workspace = true }
 pallet-node-authorization = { workspace = true }
 pallet-multisig = { workspace = true }
+pallet-gasless = { workspace = true }
 # Frontier
 fp-account = { workspace = true, features = ["serde"] }
 fp-evm = { workspace = true, features = ["serde"] }
@@ -126,6 +127,7 @@ std = [
 	"pallet-multisig/std",
 	'pallet-session/std',
 	'substrate-validator-set/std',
+	'pallet-gasless/std'
 ]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",

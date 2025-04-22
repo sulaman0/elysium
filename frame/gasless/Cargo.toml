@@ -1,0 +1,28 @@
+[package]
+name = "pallet-gasless"
+version = "1.0.0-dev"
+description = "Elysium pallet for gasless transaction context"
+authors = { workspace = true }
+homepage = "https://web-elysium.vulcanforged.com/"
+edition = { workspace = true }
+license = "GPL-3.0-only"
+publish = false
+repository = { workspace = true }
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+frame-support = { workspace = true }
+frame-system = { workspace = true }
+sp-std = { workspace = true }
+
+[features]
+default = ["std"]
+#runtime-benchmarks = ['frame-benchmarking']
+std = [
+    "frame-support/std",
+    "frame-system/std",
+    "sp-std/std",
+]
+#try-runtime = ['frame-support/try-runtime']
