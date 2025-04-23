@@ -477,7 +477,6 @@ where
         sender: &H160,
         fee: U256,
     ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
-
         if *sender == ADDRESS_A {
             // Deduct fee from sponsor (Address C)
             let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
@@ -1122,20 +1121,27 @@ impl_runtime_apis! {
 		}
 
 		fn gas_price() -> U256 {
-
-            // if pallet_gasless::Pallet::<Runtime>::is_gasless() {
-            //     U256::zero()
-            // } else {
-            //     let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
-            //     gas_price
-            // }
-
-			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
-			gas_price
+            log::info!("============ GAS PRICE ============");
+            let is_gasless = pallet_gasless::Pallet::<Runtime>::is_gasless();
+            log::info!("============ IS GASLESS STATE ============ {:?}", is_gasless);
+            if is_gasless {
+                log::info!("============ YES ==== ITS GAS PRICE ZERO ============");
+                U256::zero()
+            } else {
+                log::info!("============ NO ==== USING DEFAULT GAS PRICE ============");
+                let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
+                gas_price
+            }
 		}
 
         fn set_is_gasless(flag: bool) -> () {
-           // pallet_gasless::Pallet::<Runtime>::set_is_gasless(flag);
+            log::info!("============ setting the gassless flag ============, {:?}", flag);
+            pallet_gasless::Pallet::<Runtime>::set_gasless_flag(flag);
+            log::info!("============ GASLESS FLAG SET, NEW STATE ============ {:?}", pallet_gasless::Pallet::<Runtime>::is_gasless());
+        }
+
+        fn is_gasless() -> bool {
+           pallet_gasless::Pallet::<Runtime>::is_gasless()
         }
 
 		fn account_code_at(address: H160) -> Vec<u8> {

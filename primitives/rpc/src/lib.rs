@@ -107,6 +107,8 @@ sp_api::decl_runtime_apis! {
 		// set flag for gas less
 		fn set_is_gasless(flag: bool) -> ();
 
+		fn is_gasless() -> bool;
+
 		/// Returns a frame_ethereum::call response. If `estimate` is true,
 		#[changed_in(2)]
 		fn call(

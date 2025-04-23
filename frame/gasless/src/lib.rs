@@ -20,7 +20,20 @@ pub mod pallet {
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-        // Empty call section to satisfy Callable trait
+        #[pallet::call_index(0)]
+        #[pallet::weight(T::DbWeight::get().writes(1))]
+        pub fn set_is_gasless(origin: OriginFor<T>, is_gasless: bool) -> DispatchResult {
+            ensure_root(origin)?;
+            IsGasless::<T>::put(is_gasless);
+            Ok(())
+        }
+    }
+
+    // Add the helper function here
+    impl<T: Config> Pallet<T> {
+        pub fn set_gasless_flag(is_gasless: bool) {
+            IsGasless::<T>::put(is_gasless);
+        }
     }
 
     #[pallet::genesis_config]
