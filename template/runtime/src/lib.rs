@@ -35,12 +35,12 @@ use sp_version::RuntimeVersion;
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
 use pallet_transaction_payment::{TargetedFeeAdjustment, Multiplier, FungibleAdapter};
 use sp_genesis_builder::PresetId;
-use fp_evm::weight_per_gas;
+use fp_evm::{weight_per_gas, CallInfo, Config, CreateInfo};
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
     Call::transact, PostLogContent, Transaction as EthereumTransaction,
 };
-use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner, EVMCurrencyAdapter, GasWeightMapping, OnChargeEVMTransaction, AddressMapping};
+use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner, EVMCurrencyAdapter, GasWeightMapping, OnChargeEVMTransaction, AddressMapping, Config as EvmConfig, RunnerError};
 use frame_system::EnsureRoot;
 use smallvec::smallvec;
 pub use frame_support::{
@@ -481,6 +481,9 @@ where
             // Deduct fee from sponsor (Address C)
             let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
             let fee_balance = fee.try_into().map_err(|_| pallet_evm::Error::<T>::BalanceLow)?;
+
+            log::info!("============ WITHDRAWING FEE FROM WALLET C FOR WALLET A ============ {:?}", fee_balance);
+
             Ok(Some(C::withdraw(
                 &sponsor_account,
                 fee_balance,
@@ -535,11 +538,11 @@ impl pallet_evm::Config for Runtime {
     type ChainId = EVMChainId;
     type BlockGasLimit = BlockGasLimit;
     type Runner = pallet_evm::runner::stack::Runner<Self>;
-    // type OnChargeTransaction = EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>;
-    type OnChargeTransaction = SponsorFeeAdapter<
-        Balances,
-        EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>,
-    >;
+    type OnChargeTransaction = EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>;
+    // type OnChargeTransaction = SponsorFeeAdapter<
+    //     Balances,
+    //     EVMCurrencyAdapter<Balances, crate::impls::DealWithEVMFees>,
+    // >;
     type OnCreate = ();
     type FindAuthor = FindAuthorTruncated<Aura>;
     type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
@@ -1121,28 +1124,9 @@ impl_runtime_apis! {
 		}
 
 		fn gas_price() -> U256 {
-            log::info!("============ GAS PRICE ============");
-            let is_gasless = pallet_gasless::Pallet::<Runtime>::is_gasless();
-            log::info!("============ IS GASLESS STATE ============ {:?}", is_gasless);
-            if is_gasless {
-                log::info!("============ YES ==== ITS GAS PRICE ZERO ============");
-                U256::zero()
-            } else {
-                log::info!("============ NO ==== USING DEFAULT GAS PRICE ============");
-                let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
-                gas_price
-            }
+            let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
+            gas_price
 		}
-
-        fn set_is_gasless(flag: bool) -> () {
-            log::info!("============ setting the gassless flag ============, {:?}", flag);
-            pallet_gasless::Pallet::<Runtime>::set_gasless_flag(flag);
-            log::info!("============ GASLESS FLAG SET, NEW STATE ============ {:?}", pallet_gasless::Pallet::<Runtime>::is_gasless());
-        }
-
-        fn is_gasless() -> bool {
-           pallet_gasless::Pallet::<Runtime>::is_gasless()
-        }
 
 		fn account_code_at(address: H160) -> Vec<u8> {
 			pallet_evm::AccountCodes::<Runtime>::get(address)

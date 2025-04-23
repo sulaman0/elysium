@@ -413,47 +413,6 @@ where
 		request: TransactionRequest,
 		number_or_hash: Option<BlockNumberOrHash>,
 	) -> RpcResult<U256> {
-
-		// Hardcoded Wallet A address
-		let wallet_a = H160([
-			0x45, 0x5E, 0x25, 0x2e, 0x22, 0x3C, 0x7B, 0x81, 0x5F, 0x44,
-			0x2C, 0x72, 0xFa, 0x2d, 0x96, 0x87, 0xA9, 0x04, 0x90, 0x32,
-		]);
-
-		log::info!("============ ESTIMATE GAS ============ {:?}", wallet_a);
-		// Set IsGasless flag for gasless transactions
-		let is_gasless = request.to == Some(wallet_a);
-		if is_gasless {
-			log::info!("============ Yes - GASLESS FREE ESTIMATE GAS ============ {:?}", request);
-			let block_hash = self.client.info().best_hash;
-			self.client
-				.runtime_api()
-				.set_is_gasless(block_hash, true)
-				.map_err(|err| internal_err(format!("set IsGasless failed: {:?}", err)))?;
-
-
-			// Immediately verify the gasless state
-			let is_gasless_state = self.client
-				.runtime_api()
-				.is_gasless(block_hash)
-				.map_err(|err| internal_err(format!("is_gasless failed: {:?}", err)))?;
-			log::info!("============ VERIFIED GASLESS STATE ============ {:?}", is_gasless_state);
-
-			// Get gas price in the same context
-			let gas_price = self.client
-				.runtime_api()
-				.gas_price(block_hash)
-				.map_err(|err| internal_err(format!("gas_price failed: {:?}", err)))?;
-			log::info!("============ GAS PRICE AFTER SETTING FLAG ============ {:?}", gas_price);
-			if gas_price != U256::zero() {
-				log::warn!("Gas price is not zero despite setting IsGasless: {:?}", gas_price);
-				// Fallback: Force zero gas price for Wallet A
-				log::info!("============ FORCING ZERO GAS PRICE FOR WALLET A ============");
-				return Ok(U256::zero());
-			}
-		}
-
-
 		let client = Arc::clone(&self.client);
 		let block_data_cache = Arc::clone(&self.block_data_cache);
 
