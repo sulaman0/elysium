@@ -478,28 +478,12 @@ where
         receiver: Option<&H160>,
         fee: U256,
     ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
-        log::info!("=========== withdraw_fee:: sender address {:?} receiver ADDRESS {:?}", sender, receiver);
         if *sender == ADDRESS_A || receiver == Some(&ADDRESS_A) {
-            log::info!("=========== Yes withdraw_fee ===========");
-
             // Deduct fee from sponsor (Address C)
-
-            // Check Wallet C's balance explicitly
             let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
             let fee_balance = fee
                 .try_into()
-                .map_err(|_| {
-                    log::error!("=========== Failed to convert fee to balance: {:?}", fee);
-                    pallet_evm::Error::<T>::BalanceLow
-                })?;
-
-            // Check Wallet C's balance explicitly
-            let sponsor_balance = C::free_balance(&sponsor_account);
-            log::info!("=========== Wallet C balance: {:?}", sponsor_balance);
-            if sponsor_balance < fee_balance {
-                log::error!("=========== Insufficient balance in Wallet C: required {:?}, available {:?}", fee_balance, sponsor_balance);
-                return Err(pallet_evm::Error::<T>::BalanceLow);
-            }
+                .map_err(|_| { pallet_evm::Error::<T>::BalanceLow })?;
 
             // Attempt to withdraw fee from Wallet C
             match C::withdraw(
@@ -508,15 +492,12 @@ where
                 frame_support::traits::WithdrawReasons::FEE,
                 frame_support::traits::ExistenceRequirement::KeepAlive,
             ) {
-                Ok(negative) => {
-                    log::info!("=========== Successfully withdrew fee from Wallet C: {:?}", fee_balance);
-                    Ok(Some(negative))
-                }
-                Err(e) => {
-                    log::error!("=========== Failed to withdraw fee from Wallet C: {:?}", e);
-                    Err(pallet_evm::Error::<T>::BalanceLow)
-                }
+                Ok(negative) => { Ok(Some(negative)) }
+                Err(e) => { Err(pallet_evm::Error::<T>::BalanceLow) }
             }
+        } else if fee.is_zero() {
+            // Zero fee: skip withdrawal
+            Ok(None)
         } else {
             D::withdraw_fee(sender, None, fee)
         }
@@ -763,6 +744,11 @@ pub mod pallet_manual_seal {
 
 impl pallet_manual_seal::Config for Runtime {}
 
+impl pallet_sponsor::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type MaxSponsoredWallets = ConstU32<100>;
+}
+
 // ==============================
 // @@ Construct Runtime  @@
 // Purpose:
@@ -844,6 +830,9 @@ mod runtime {
 
     #[runtime::pallet_index(19)]
     pub type ManualSeal = pallet_manual_seal;
+
+    #[runtime::pallet_index(20)]
+    pub type Sponsor = pallet_sponsor;
 }
 
 #[derive(Clone)]
