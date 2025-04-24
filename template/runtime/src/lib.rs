@@ -38,7 +38,7 @@ use sp_genesis_builder::PresetId;
 use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
-    Call::transact, PostLogContent, Transaction as EthereumTransaction
+    Call::transact, PostLogContent, Transaction as EthereumTransaction,
 };
 use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner, EVMCurrencyAdapter, GasWeightMapping, OnChargeEVMTransaction, AddressMapping};
 use frame_system::EnsureRoot;
@@ -455,10 +455,10 @@ impl FeeCalculator for TransactionPaymentAsGasPrice {
 // Hardcoded addresses (use static lazy to avoid const fn issue)
 static ADDRESS_A: H160 = H160([
     0x45, 0x5E, 0x25, 0x2e, 0x22, 0x3C, 0x7B, 0x81, 0x5F, 0x44, 0x2C, 0x72, 0xFa, 0x2d, 0x96, 0x87, 0xA9, 0x04, 0x90, 0x32,
-]);
+]); // 0x455E252e223C7B815F442C72Fa2d9687A9049032
 static ADDRESS_C: H160 = H160([
     0xbe, 0x3a, 0xC1, 0x84, 0x5D, 0x06, 0x06, 0x51, 0x7F, 0xE5, 0xEC, 0x95, 0xa3, 0xb8, 0xa0, 0xba, 0x5B, 0x32, 0x28, 0x61,
-]);
+]); // 0xbe3aC1845D0606517FE5EC95a3b8a0ba5B322861
 
 // Custom OnChargeTransaction for sponsor fees
 pub struct SponsorFeeAdapter<C, D>(sp_std::marker::PhantomData<(C, D)>);
@@ -467,7 +467,7 @@ impl<T, C, D> OnChargeEVMTransaction<T> for SponsorFeeAdapter<C, D>
 where
     T: pallet_evm::Config,
     C: Currency<T::AccountId>,
-    D: OnChargeEVMTransaction<T, LiquidityInfo = Option<C::NegativeImbalance>>,
+    D: OnChargeEVMTransaction<T, LiquidityInfo=Option<C::NegativeImbalance>>,
     C::NegativeImbalance: Imbalance<C::Balance>,
     C::Balance: TryFrom<U256> + TryInto<u128>,
 {
@@ -475,20 +475,50 @@ where
 
     fn withdraw_fee(
         sender: &H160,
+        receiver: Option<&H160>,
         fee: U256,
     ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
-        if *sender == ADDRESS_A {
+        log::info!("=========== withdraw_fee:: sender address {:?} receiver ADDRESS {:?}", sender, receiver);
+        if *sender == ADDRESS_A || receiver == Some(&ADDRESS_A) {
+            log::info!("=========== Yes withdraw_fee ===========");
+
             // Deduct fee from sponsor (Address C)
+
+            // Check Wallet C's balance explicitly
             let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
-            let fee_balance = fee.try_into().map_err(|_| pallet_evm::Error::<T>::BalanceLow)?;
-            Ok(Some(C::withdraw(
+            let fee_balance = fee
+                .try_into()
+                .map_err(|_| {
+                    log::error!("=========== Failed to convert fee to balance: {:?}", fee);
+                    pallet_evm::Error::<T>::BalanceLow
+                })?;
+
+            // Check Wallet C's balance explicitly
+            let sponsor_balance = C::free_balance(&sponsor_account);
+            log::info!("=========== Wallet C balance: {:?}", sponsor_balance);
+            if sponsor_balance < fee_balance {
+                log::error!("=========== Insufficient balance in Wallet C: required {:?}, available {:?}", fee_balance, sponsor_balance);
+                return Err(pallet_evm::Error::<T>::BalanceLow);
+            }
+
+            // Attempt to withdraw fee from Wallet C
+            match C::withdraw(
                 &sponsor_account,
                 fee_balance,
                 frame_support::traits::WithdrawReasons::FEE,
                 frame_support::traits::ExistenceRequirement::KeepAlive,
-            ).map_err(|_| pallet_evm::Error::<T>::BalanceLow)?))
+            ) {
+                Ok(negative) => {
+                    log::info!("=========== Successfully withdrew fee from Wallet C: {:?}", fee_balance);
+                    Ok(Some(negative))
+                }
+                Err(e) => {
+                    log::error!("=========== Failed to withdraw fee from Wallet C: {:?}", e);
+                    Err(pallet_evm::Error::<T>::BalanceLow)
+                }
+            }
         } else {
-            D::withdraw_fee(sender, fee)
+            D::withdraw_fee(sender, None, fee)
         }
     }
 
