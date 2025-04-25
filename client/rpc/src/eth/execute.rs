@@ -420,8 +420,6 @@ where
 		let sender = request.from.unwrap_or_default(); // Default to zero address if None
 		let receiver = request.to;
 
-		log::info!("================== SENDER AND RECEIVER WALLET ADDRESSES ARE {:?} {:?}", sender, receiver);
-
 		let client = Arc::clone(&self.client);
 		let block_data_cache = Arc::clone(&self.block_data_cache);
 
