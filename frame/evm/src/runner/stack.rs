@@ -377,23 +377,6 @@ where
         evm_config: &evm::Config,
     ) -> Result<(), RunnerError<Self::Error>> {
         let (base_fee, mut weight) = T::FeeCalculator::min_gas_price();
-        log::info!("=========== is_transactional validation");
-
-        log::info!("=========== is_transactional");
-        let total_fee = max_fee_per_gas.unwrap_or(U256::zero()).checked_mul(U256::from(gas_limit))
-            .ok_or(RunnerError {
-                error: Error::<T>::FeeOverflow,
-                weight: Weight::zero(),
-            })?;
-        T::OnChargeTransaction::withdraw_fee(&source, Option::from(&target), total_fee)
-            .map_err(|e| {
-                log::error!("Validation: Withdraw fee failed: {:?}", e);
-                RunnerError { error: e, weight: Weight::zero() }
-            })?;
-
-
-        log::info!("=========== is_transactional pass validation");
-
         let (source_account, inner_weight) = Pallet::<T>::account_basic(&source);
         weight = weight.saturating_add(inner_weight);
 
