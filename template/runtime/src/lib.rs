@@ -478,9 +478,13 @@ where
         receiver: Option<&H160>,
         fee: U256,
     ) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
-        if *sender == ADDRESS_A || receiver == Some(&ADDRESS_A) {
+        let sponsor_wallet = pallet_sponsor::SponsoredWallets::<Runtime>::iter()
+            .find(|(_sponsor, wallets)| wallets.contains(sender) || receiver.map_or(false, |r| wallets.contains(r)))
+            .map(|(sponsor, _)| sponsor);
+
+        if let Some(sponsor_wallet) = sponsor_wallet {
             // Deduct fee from sponsor (Address C)
-            let sponsor_account = T::AddressMapping::into_account_id(ADDRESS_C);
+            let sponsor_account = T::AddressMapping::into_account_id(sponsor_wallet);
             let fee_balance = fee
                 .try_into()
                 .map_err(|_| { pallet_evm::Error::<T>::BalanceLow })?;
@@ -1133,6 +1137,20 @@ impl_runtime_apis! {
 			let (gas_price, _) = <Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price();
 			gas_price
 		}
+
+        fn check_sponsor_balance(sender: H160, receiver: Option<H160>) -> Option<U256> {
+            // Iterate over SponsoredWallets to find a sponsor whose wallets include sender or receiver
+            let sponsor_wallet = pallet_sponsor::SponsoredWallets::<Runtime>::iter()
+                .find(|(_sponsor, wallets)| {
+                    wallets.contains(&sender) || receiver.map_or(false, |r| wallets.contains(&r))
+                })
+                .map(|(sponsor, _)| sponsor);
+
+            // If a sponsor wallet is found, return its EVM balance
+            sponsor_wallet.map(|sponsor| {
+                pallet_evm::Pallet::<Runtime>::account_basic(&sponsor).0.balance
+            })
+        }
 
 		fn account_code_at(address: H160) -> Vec<u8> {
 			pallet_evm::AccountCodes::<Runtime>::get(address)
