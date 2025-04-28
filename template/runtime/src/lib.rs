@@ -503,12 +503,9 @@ where
         corrected_fee: U256,
         base_fee: U256,
         already_withdrawn: Self::LiquidityInfo,
+        receiver: Option<&H160>,
     ) -> Self::LiquidityInfo {
-        if *sender == ADDRESS_A {
-            already_withdrawn // No correction for sponsored fees
-        } else {
-            D::correct_and_deposit_fee(sender, corrected_fee, base_fee, already_withdrawn)
-        }
+            D::correct_and_deposit_fee(sender, corrected_fee, base_fee, already_withdrawn, receiver)
     }
 
     fn pay_priority_fee(tip: Self::LiquidityInfo) {
