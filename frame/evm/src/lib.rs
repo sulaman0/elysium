@@ -946,6 +946,7 @@ pub trait OnChargeEVMTransaction<T: Config> {
         corrected_fee: U256,
         base_fee: U256,
         already_withdrawn: Self::LiquidityInfo,
+        target: Option<&H160>
     ) -> Self::LiquidityInfo;
 
     /// Introduced in EIP1559 to handle the priority tip.
@@ -996,6 +997,7 @@ where
         corrected_fee: U256,
         base_fee: U256,
         already_withdrawn: Self::LiquidityInfo,
+        _target: Option<&H160>
     ) -> Self::LiquidityInfo {
         if let Some(paid) = already_withdrawn {
             let account_id = T::AddressMapping::into_account_id(*who);
@@ -1089,6 +1091,7 @@ where
         corrected_fee: U256,
         base_fee: U256,
         already_withdrawn: Self::LiquidityInfo,
+        _target: Option<&H160>
     ) -> Self::LiquidityInfo {
         if let Some(paid) = already_withdrawn {
             let account_id = T::AddressMapping::into_account_id(*who);
@@ -1145,12 +1148,14 @@ where
         corrected_fee: U256,
         base_fee: U256,
         already_withdrawn: Self::LiquidityInfo,
+        _target: Option<&H160>
     ) -> Self::LiquidityInfo {
         <EVMFungibleAdapter<T::Currency, ()> as OnChargeEVMTransaction<T>>::correct_and_deposit_fee(
             who,
             corrected_fee,
             base_fee,
             already_withdrawn,
+            _target
         )
     }
 
