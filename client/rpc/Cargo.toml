@@ -61,7 +61,6 @@ fp-evm = { workspace = true, features = ["default"] }
 fp-rpc = { workspace = true, features = ["default"] }
 fp-storage = { workspace = true, features = ["default"] }
 pallet-evm = { workspace = true, features = ["default"] }
-pallet-sponsor = { workspace = true, features = ["default"] }
 
 [dev-dependencies]
 tempfile = "3.10.1"
@@ -79,9 +78,6 @@ rocksdb = [
 	"sc-service/rocksdb",
 	"fc-db/rocksdb",
 	"fc-mapping-sync/rocksdb",
-]
-std = [
-	"pallet-sponsor/std", # Add this
 ]
 txpool = ["fc-rpc-core/txpool"]
 rpc-binary-search-estimate = []
