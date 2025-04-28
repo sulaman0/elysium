@@ -35,7 +35,7 @@ use sp_version::RuntimeVersion;
 use frame_support::weights::constants::RocksDbWeight as RuntimeDbWeight;
 use pallet_transaction_payment::{TargetedFeeAdjustment, Multiplier, FungibleAdapter};
 use sp_genesis_builder::PresetId;
-use fp_evm::weight_per_gas;
+// use fp_evm::weight_per_gas;
 use fp_rpc::TransactionStatus;
 use pallet_ethereum::{
     Call::transact, PostLogContent, Transaction as EthereumTransaction,
@@ -488,7 +488,7 @@ where
                 frame_support::traits::ExistenceRequirement::KeepAlive,
             ) {
                 Ok(negative) => { Ok(Some(negative)) }
-                Err(e) => { Err(pallet_evm::Error::<T>::BalanceLow) }
+                Err(_e) => { Err(pallet_evm::Error::<T>::BalanceLow) }
             }
         } else if fee.is_zero() {
             // Zero fee: skip withdrawal
@@ -505,7 +505,16 @@ where
         already_withdrawn: Self::LiquidityInfo,
         receiver: Option<&H160>,
     ) -> Self::LiquidityInfo {
+        let sponsor_wallet = pallet_sponsor::SponsoredWallets::<Runtime>::iter()
+            .find(|(_sponsor, wallets)| wallets.contains(sender) || receiver.map_or(false, |r| wallets.contains(r)))
+            .map(|(sponsor, _)| sponsor);
+
+        if let Some(_sponsor_wallet) = sponsor_wallet {
+            already_withdrawn
+        }else{
             D::correct_and_deposit_fee(sender, corrected_fee, base_fee, already_withdrawn, receiver)
+        }
+
     }
 
     fn pay_priority_fee(tip: Self::LiquidityInfo) {
