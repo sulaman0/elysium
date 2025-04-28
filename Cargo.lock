@@ -2449,7 +2449,6 @@ dependencies = [
  "libsecp256k1",
  "log",
  "pallet-evm",
- "pallet-sponsor",
  "parity-scale-codec",
  "prometheus",
  "rand",
