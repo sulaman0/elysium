@@ -206,6 +206,7 @@ pallet-evm-precompile-simple = { path = "frame/evm/precompile/simple", default-f
 pallet-evm-test-vector-support = { path = "frame/evm/test-vector-support" }
 pallet-hotfix-sufficients = { path = "frame/hotfix-sufficients", default-features = false }
 pallet-sponsor = { path = "frame/sponsor", default-features = false }
+pallet-evm-sponsor = { path = "frame/evm-sponsor", default-features = false }
 
 # Frontier Utility
 precompile-utils = { path = "precompiles", default-features = false }
