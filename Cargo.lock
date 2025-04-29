@@ -2035,6 +2035,7 @@ dependencies = [
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
+ "pallet-evm-sponsor",
  "pallet-grandpa",
  "pallet-hotfix-sufficients",
  "pallet-insecure-randomness-collective-flip",
@@ -6171,6 +6172,23 @@ dependencies = [
  "pallet-evm-test-vector-support",
  "ripemd",
  "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-sponsor"
+version = "1.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
