@@ -15,6 +15,8 @@ targets = ["x86_64-unknown-linux-gnu"]
 smallvec = { workspace = true }
 scale-codec = { package = "parity-scale-codec", workspace = true }
 scale-info = { workspace = true }
+hex = { workspace = true }
+
 #bs58 = { workspace = true }
 
 # Substrate
@@ -68,7 +70,7 @@ pallet-hotfix-sufficients = { workspace = true }
 pallet-session = { workspace = true }
 pallet-authorship = { workspace = true }
 pallet-sponsor = { workspace = true }
-pallet-evm-sponsor = { workspace = true }
+pallet-evm-sponsor = { workspace = true, default-features = false }
 log = "0.4.25"
 
 [build-dependencies]

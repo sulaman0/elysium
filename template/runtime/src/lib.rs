@@ -56,8 +56,9 @@ use frame_system::EnsureRoot;
 pub use pallet_balances::Call as BalancesCall;
 use pallet_ethereum::{Call::transact, PostLogContent, Transaction as EthereumTransaction};
 use pallet_evm::{
-	Account as EVMAccount, AddressMapping, EVMCurrencyAdapter, EnsureAddressTruncated,
-	FeeCalculator, GasWeightMapping, HashedAddressMapping, OnChargeEVMTransaction, Runner,
+	Account as EVMAccount, AccountStorages, AddressMapping, EVMCurrencyAdapter,
+	EnsureAddressTruncated, FeeCalculator, GasWeightMapping, HashedAddressMapping,
+	OnChargeEVMTransaction, Runner,
 };
 pub use pallet_timestamp::Call as TimestampCall;
 use smallvec::smallvec;
@@ -143,7 +144,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("elysium"),
 	impl_name: create_runtime_str!("elysium"),
 	authoring_version: 1,
-	spec_version: 9,
+	spec_version: 12,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -463,7 +464,7 @@ pub struct SponsorFeeAdapter<C, D>(sp_std::marker::PhantomData<(C, D)>);
 
 impl<T, C, D> OnChargeEVMTransaction<T> for SponsorFeeAdapter<C, D>
 where
-	T: pallet_evm::Config,
+	T: pallet_evm::Config + pallet_evm_sponsor::Config,
 	C: Currency<T::AccountId>,
 	D: OnChargeEVMTransaction<T, LiquidityInfo = Option<C::NegativeImbalance>>,
 	C::NegativeImbalance: Imbalance<C::Balance>,
@@ -476,6 +477,39 @@ where
 		receiver: Option<&H160>,
 		fee: U256,
 	) -> Result<Self::LiquidityInfo, pallet_evm::Error<T>> {
+
+		let contract_address = pallet_evm_sponsor::SponsorManagerAddress::<T>::get()
+			.unwrap_or_else(|| {
+				log::warn!("No sponsor manager address set.");
+				H160::zero()
+			});
+
+		let sender: H160 = <T as pallet_evm::Config>::AddressMapping::into_account_id(*sender).into(); // or predefined
+		let target: H160 = contract_address;
+		let value: U256 = U256::zero();
+		let gas_limit: u64 = 100_000;
+		let gas_price: U256 = U256::from(1);
+		let nonce: Option<U256> = None;
+		let data: Vec<u8> = hex_literal::hex!("... encoded ABI data for getSponsor(address)");
+
+
+
+
+
+
+
+		// get storage of EVM.
+
+
+		if contract_address != H160::zero() {
+			let slot = H256::zero();
+			let value = AccountStorages::<T>::get(contract_address, slot);
+			let number = U256::from_big_endian(value.as_bytes());
+			log::info!("=============== STORAGE CONTRACT ADDRESS VALUE IS : {:?} & contract address: {:?} and slot {:?}, and number {:?}", value, contract_address, slot, number);
+		} else {
+			log::info!("=============== NO CONTRACT ADDRESS found")
+		}
+
 		let sponsor_wallet = pallet_sponsor::SponsoredWallets::<Runtime>::iter()
 			.find(|(_sponsor, wallets)| {
 				wallets.contains(sender) || receiver.map_or(false, |r| wallets.contains(r))
@@ -759,7 +793,7 @@ impl pallet_sponsor::Config for Runtime {
 }
 
 impl pallet_evm_sponsor::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
+	type RuntimeEvent = RuntimeEvent;
 }
 
 // ==============================
